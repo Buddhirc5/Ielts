@@ -6,6 +6,7 @@ import { dayKey, skillBands, useStore } from '../store'
 import { recommend, type Recommendation } from '../lib/engines'
 import { DRILL_TYPES, EXAMS } from '../lib/exams'
 import { LESSONS, PEERS } from '../data/curriculum'
+import { Leaderboard } from '../components/Account'
 import { Avatars, BandBadge, Bento, CircleBtn, Coin, ICON, Meter, Pill, Ring, SectionTitle, Segmented, Sheet, StripedBars, Tag, UpRight, cx, fmtBand, spring } from '../components/ui'
 
 export const SKILL_ICON: Record<Skill, LucideIcon> = { listening: Headphones, reading: BookOpen, writing: PenLine, speaking: Mic }
@@ -153,6 +154,7 @@ export default function Dashboard() {
               <div className="mb-3 flex items-center justify-between"><span className="font-bold">Estimated bands</span><button className="min-h-11 text-xs font-bold underline" onClick={() => s.setView('analytics')}>Details</button></div>
               <div className="grid gap-3">{(Object.keys(bands) as Skill[]).map((k, i) => <Meter key={k} label={k[0].toUpperCase() + k.slice(1)} value={bands[k]} color={['#3D7A74', '#EC6B78', '#F5B841', '#9C8AE0'][i]} />)}</div>
             </Bento>
+            <Leaderboard />
             <Bento className="bg-butter" onClick={() => { s.setView('practice'); setTimeout(() => document.getElementById('deck')?.scrollIntoView({ behavior: 'smooth' }), 200) }}>
               <div className="flex items-center justify-between"><div><div className="text-sm font-semibold text-ink/70">Band 8+ deck · spaced repetition</div><div className="text-4xl font-extrabold tracking-tight tabnum">{due} <span className="text-base font-bold">cards due</span></div></div><CircleBtn label="Review cards" /></div>
             </Bento>

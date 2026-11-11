@@ -11,6 +11,7 @@ import WritingLab from './views/WritingLab'
 import Speaking from './views/Speaking'
 import Mock from './views/Mock'
 import Analytics from './views/Analytics'
+import { AccountPanel, SyncDot } from './components/Account'
 
 const Exam = lazy(() => import('./views/Exam'))
 const TABS: { id: View; label: string; icon: LucideIcon }[] = [
@@ -94,7 +95,7 @@ export default function App() {
         </nav>
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
           <Segmented value={track} onChange={(t) => setProfile({ track: t })} options={[{ value: 'academic', label: 'Academic' }, { value: 'general', label: 'General' }]} />
-          <button onClick={() => setProfile2(true)} aria-label="Profile and settings" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-lav font-bold">{name ? name[0].toUpperCase() : <User size={18} {...ICON} />}</button>
+          <button onClick={() => setProfile2(true)} aria-label="Profile and settings" className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-lav font-bold">{name ? name[0].toUpperCase() : <User size={18} {...ICON} />}<SyncDot /></button>
         </div>
       </header>
       <AnimatePresence mode="wait">
@@ -111,7 +112,8 @@ export default function App() {
         {profile && (
           <Sheet onClose={() => setProfile2(false)}>
             <div className="p-6">
-              <h2 className="mb-4 text-2xl font-bold tracking-tight">Profile & goal</h2>
+              <AccountPanel />
+              <h2 className="mb-4 mt-6 text-2xl font-bold tracking-tight">Profile & goal</h2>
               <ProfileForm onDone={() => setProfile2(false)} cta="Save" />
               <div className="mt-6 rounded-[20px] bg-white p-4 text-sm">
                 <b>{demo ? 'You are viewing sample progress' : 'Your data'}</b>
