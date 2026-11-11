@@ -29,7 +29,7 @@ export function Pill({ children, onClick, variant = 'dark', className = '', disa
 }
 export function CircleBtn({ onClick, icon, label, className = '', ring }: { onClick?: () => void; icon?: ReactNode; label: string; className?: string; ring?: boolean }) {
   return (
-    <motion.button aria-label={label} title={label} onClick={(e) => { e.stopPropagation(); onClick?.() }} whileHover={{ scale: 1.08, rotate: -6 }} whileTap={{ scale: 0.92 }} transition={spring}
+    <motion.button aria-label={label} title={label} onClick={onClick ? (e) => { e.stopPropagation(); onClick() } : undefined} whileHover={{ scale: 1.08, rotate: -6 }} whileTap={{ scale: 0.92 }} transition={spring}
       className={cx('relative grid h-11 w-11 shrink-0 place-items-center rounded-full border border-black/10 bg-white text-ink', className)}>
       {ring && <span className="absolute -inset-1 rounded-full border-2 border-transparent border-r-lavdeep border-t-lavdeep" />}
       {icon ?? <ArrowRight size={18} {...ICON} />}
@@ -67,7 +67,7 @@ export function Avatars({ names, extra }: { names: string[]; extra?: string }) {
   )
 }
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
-  return <div className="mb-4 flex items-end justify-between gap-3"><h2 className="text-2xl font-bold tracking-tight text-slate-900">{children}</h2>{right}</div>
+  return <div className="mb-4 flex flex-wrap items-end justify-between gap-3"><h2 className="text-2xl font-bold tracking-tight text-slate-900">{children}</h2>{right}</div>
 }
 export function Segmented<T extends string>({ value, onChange, options, className = '' }: { value: T; onChange: (v: T) => void; options: { value: T; label: string }[]; className?: string }) {
   return (
@@ -84,12 +84,12 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
 /** Vertical pill bars with a hatched track, solid fill and a floating dark badge at the crest. */
 export function StripedBars({ data, height = 220 }: { data: { label: string; pct: number; value: string; sub?: string; color: string }[]; height?: number }) {
   return (
-    <div className="flex items-end justify-between gap-2 sm:gap-3">
+    <div className="flex items-end justify-between gap-2 pt-3 sm:gap-3">
       {data.map((d, i) => {
         const h = Math.max(0.2, Math.min(1, d.pct / 100))
         return (
           <div key={d.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
-            <div className="hatch relative w-full max-w-24 overflow-hidden rounded-full bg-white/50" style={{ height }}>
+            <div className="hatch relative w-full max-w-24 rounded-full bg-white/50" style={{ height }}>
               <motion.div initial={{ height: 0 }} animate={{ height: `${h * 100}%` }} transition={{ ...spring, delay: i * 0.05 }} className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-center rounded-full" style={{ background: d.color }}>
                 <span className="absolute -top-3 rounded-full bg-ink px-2.5 py-1 text-[11px] font-bold text-white tabnum">{Math.round(d.pct)}%</span>
                 <span className="text-lg font-extrabold leading-none tracking-tight text-ink">{d.value}</span>
@@ -146,7 +146,7 @@ export function Books({ className = '' }: { className?: string }) {
 export function Coin({ done, label, today }: { done: boolean; label: string; today?: boolean }) {
   return (
     <div className="flex flex-col items-center gap-1.5">
-      <motion.div animate={today && !done ? { scale: [1, 1.08, 1] } : {}} transition={{ repeat: Infinity, duration: 1.6 }} className={cx('grid h-11 w-11 place-items-center rounded-full border-2', done ? 'border-gold bg-gold text-ink shadow-[inset_0_-3px_0_rgba(0,0,0,.15)]' : 'border-white/40 bg-white/15 text-white/80')}>
+      <motion.div animate={today && !done ? { scale: [1, 1.08, 1] } : {}} transition={{ repeat: Infinity, duration: 1.6 }} className={cx('grid aspect-square w-full max-w-11 place-items-center rounded-full border-2', done ? 'border-gold bg-gold text-ink shadow-[inset_0_-3px_0_rgba(0,0,0,.15)]' : 'border-white/40 bg-white/15 text-white/80')}>
         {done ? <Star size={18} fill="#141416" {...ICON} /> : <span className="text-xs font-bold">{label[0]}</span>}
       </motion.div>
       <span className="text-[11px] font-semibold text-white/90">{label}</span>

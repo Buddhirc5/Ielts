@@ -195,7 +195,7 @@ export function SpeakingRunner({ cueId, mode, onFinish }: { cueId: string; mode:
         )}
       </div>
       <div className="grid content-start gap-4">
-        <Bento className="bg-mint text-center">
+        <Bento className="flex flex-col items-center bg-mint text-center">
           <Ring value={left / step.limit} size={132} stroke={10} color={left <= 10 ? '#EC6B78' : '#141416'}>
             <div><div className="text-4xl font-extrabold tracking-tight tabnum">{Math.floor(left / 60)}:{String(left % 60).padStart(2, '0')}</div><div className="text-[11px] font-semibold opacity-60">{step.kind === 'prep' ? 'preparation' : 'to answer'}</div></div>
           </Ring>

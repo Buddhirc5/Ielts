@@ -18,6 +18,7 @@ const half = (n: number) => Math.round(n * 2) / 2
 const clamp = (n: number, lo = 1, hi = 9) => Math.max(lo, Math.min(hi, n))
 const SUBORD = /\b(although|though|even though|whereas|while|whilst|because|since|unless|provided that|as long as|despite the fact that|so that|in order that|if|when|whenever|once|until|after|before|as soon as|given that|whether)\b/i
 const RELATIVE = /\b(which|whose|whereby|whom|who|, where|that (is|are|was|were|has|have|can|will|would))\b/i
+const PARTICIPLE = /(^|, |; )(having|being|starting|compared|given|followed|leaving|making|reducing|overtaking|finishing|reaching|fearing|resulting|leading|causing|allowing)\b|, (\w{4,}ing) |\b(after|from|in|during|by|on) which\b|\b(more|less|fewer|higher|lower|\w+er) than\b.*\b(was|were|is|are|did|had)\b/i
 const COORD = /,\s*(and|but|or|so|yet|nor)\s|;\s|\b(and|but|so)\s+(it|they|this|these|he|she|we|i|there|the)\b/i
 const PASSIVE = /\b(is|are|was|were|be|been|being)\s+(\w+ly\s+)?(\w+ed|built|made|done|given|taken|seen|shown|known|found|held|kept|left|sold|sent|spent|grown|paid|put|cut|set|drawn|driven|written|chosen)\b/gi
 const COND = /\b(if|unless|provided that|as long as|were .* to|had .* (been|known|not))\b/i
@@ -46,6 +47,7 @@ export function analyze(text: string, opts: { task: TaskKind; prompt: string }):
   const paragraphs = text.split(/\n\s*\n|\n/).map((p) => p.trim()).filter((p) => countWords(p) >= 3)
   const rawSentences = splitSentences(text)
 
+  const promptLower = prompt.toLowerCase()
   // ---------- Lexical profile ----------
   const tokens: Token[] = []
   const freq: Record<string, number> = {}
@@ -53,7 +55,8 @@ export function analyze(text: string, opts: { task: TaskKind; prompt: string }):
   let m: RegExpExecArray | null
   while ((m = re.exec(text))) {
     const t = m[0], l = t.toLowerCase()
-    const tok: Token = { text: t, start: m.index, end: m.index + t.length, level: STOP.has(l) ? 'common' : levelOf(l) }
+    // words lifted straight from the prompt earn no lexical credit
+    const tok: Token = { text: t, start: m.index, end: m.index + t.length, level: STOP.has(l) || (l.length > 3 && promptLower.includes(l.replace(/(s|ed|ing)$/, ''))) ? 'common' : levelOf(l) }
     if (WEAK[l]) tok.weak = l
     tokens.push(tok)
     if (!STOP.has(l) && l.length > 2) freq[l] = (freq[l] || 0) + 1
@@ -80,7 +83,7 @@ export function analyze(text: string, opts: { task: TaskKind; prompt: string }):
 
   // ---------- Grammar ----------
   const sentences: SentenceInfo[] = rawSentences.map((s) => {
-    const kind = SUBORD.test(s) || RELATIVE.test(s) ? 'complex' : COORD.test(s) ? 'compound' : 'simple'
+    const kind = SUBORD.test(s) || RELATIVE.test(s) || PARTICIPLE.test(s) ? 'complex' : COORD.test(s) ? 'compound' : 'simple'
     return { text: s, kind, words: countWords(s) }
   })
   const sn = Math.max(1, sentences.length)
@@ -114,7 +117,7 @@ export function analyze(text: string, opts: { task: TaskKind; prompt: string }):
   let mech = 0
   for (const s of rawSentences) { const sl = s.toLowerCase(); const hit = MECHANICAL.find((x) => sl.startsWith(x + ',') || sl.startsWith(x + ' ')); if (hit) { mech++; if (!mechanical.includes(hit)) mechanical.push(hit) } }
   const mechanicalRate = mech / sn
-  const referencing = REFERENCING.reduce((a, r) => a + (lower.match(new RegExp(`\\b${r}\\b`, 'g')) || []).length, 0)
+  const referencing = REFERENCING.reduce((a, r) => a + (lower.match(new RegExp(`\\b${r}\\b`, 'g')) || []).length, 0) + Math.floor((lower.match(/\b(this|these|such|its|their|both|each|those|that of|respectively)\b/g) || []).length / 2)
 
   // ---------- Task achievement ----------
   const kws = promptKeywords(prompt)
@@ -137,7 +140,7 @@ export function analyze(text: string, opts: { task: TaskKind; prompt: string }):
   const wordPenalty = words < minWords
 
   // ---------- Band estimation ----------
-  let ta = 5.5
+  let ta = 5
   if (!wordPenalty) ta += 0.5
   else ta -= Math.min(2.5, Math.ceil(((minWords - words) / minWords) * 10) * 0.5)
   if (pOk) ta += 0.5
@@ -153,21 +156,22 @@ export function analyze(text: string, opts: { task: TaskKind; prompt: string }):
   const density = total / sn
   if (density >= 0.3 && density <= 1.1) cc += 0.5
   if (mechanicalRate > 0.35) cc -= 1
-  cc += referencing >= 4 ? 1 : referencing >= 2 ? 0.5 : 0
+  cc += referencing >= 5 ? 1.5 : referencing >= 3 ? 1 : referencing >= 1 ? 0.5 : 0
+  if (ttr < 0.64) cc -= 0.5
   if (pOk) cc += 0.5; else if (paragraphs.length <= 1) cc -= 1
   if (balance >= 0.55) cc += 0.5
 
   let lr = 4.5
-  lr += pct.c1 >= 8 ? 1.5 : pct.c1 >= 5 ? 1 : pct.c1 >= 2.5 ? 0.5 : 0
-  lr += pct.b2 >= 16 ? 1.5 : pct.b2 >= 10 ? 1 : pct.b2 >= 6 ? 0.5 : 0
-  lr += ttr >= 0.8 ? 1 : ttr >= 0.72 ? 0.5 : 0
+  const adv = pct.b2 + 2.5 * pct.c1
+  lr += adv >= 20 ? 3 : adv >= 15 ? 2.5 : adv >= 11 ? 2 : adv >= 8 ? 1.5 : adv >= 5 ? 1 : adv >= 2.5 ? 0.5 : 0
+  lr += ttr >= 0.8 ? 1 : ttr >= 0.76 ? 0.5 : ttr < 0.64 ? -0.5 : 0
   const weakRate = (weak.reduce((a, b) => a + b.count, 0) / Math.max(1, words)) * 100
   if (weakRate > 3) lr -= 1; else if (weakRate > 1.5) lr -= 0.5; else lr += 0.5
   if (repeated.length > 5) lr -= 0.5
 
   let gra = 4.5
   const cx = share('complex')
-  gra += cx >= 55 ? 1.5 : cx >= 40 ? 1 : cx >= 20 ? 0.5 : 0
+  gra += cx >= 60 ? 2 : cx >= 45 ? 1.5 : cx >= 30 ? 1 : cx >= 15 ? 0.5 : 0
   if (share('compound') >= 8 && share('simple') >= 8) gra += 0.5
   if (passives >= 2) gra += 0.5
   if (conditionals + relatives >= 2) gra += 0.5
@@ -191,7 +195,7 @@ export function analyze(text: string, opts: { task: TaskKind; prompt: string }):
   if (missing.length && coverage < 0.7) tips.push(`Parts of the question may be under-developed. Not yet addressed: ${missing.slice(0, 4).join(', ')}.`)
   if (mechanicalRate > 0.35) tips.push(`${Math.round(mechanicalRate * 100)}% of your sentences open with a mechanical linker (${mechanical.slice(0, 3).join(', ')}). Replace some with referencing: this trend, such measures, the former.`)
   if (referencing < 2 && words > 80) tips.push('Use referencing to connect ideas organically: "this trend", "such measures", "the former / the latter".')
-  if (pct.c1 < 2.5 && words > 80) tips.push('Lexical range is narrow. Replace two or three common words with precise academic choices — tap the highlighted words for suggestions.')
+  if (adv < 8 && words > 80) tips.push('Lexical range is narrow. Replace two or three common words with precise academic choices — tap the highlighted words for suggestions.')
   if (weak.length) tips.push(`Upgrade vague words: ${weak.slice(0, 4).map((x) => `${x.word} → ${x.upgrades[0]}`).join('; ')}.`)
   if (cx < 30 && words > 80) tips.push(`Only ${cx}% of sentences are complex. Add clauses with although, whereas, which or provided that.`)
   if (passives === 0 && task === 'task1' && words > 80) tips.push('Include at least one passive structure — it is natural in academic description.')

@@ -48,7 +48,7 @@ export function ModuleSheet({ rec, onClose }: { rec: Recommendation; onClose: ()
         </div>
         <div className="mt-5 flex flex-wrap gap-2">{[`#${rec.module.skill[0].toUpperCase()}${rec.module.skill.slice(1)}`, '#IELTSAcademic', '#BandBooster', '#TimedPractice'].map((t, i) => <Tag key={t} i={i} className={i % 2 ? 'bg-ink/25 text-white' : 'bg-white/30 text-white'}>{t}</Tag>)}</div>
       </div>
-      <div className="-mt-7 rounded-t-[32px] bg-cream p-5">
+      <div className="relative -mt-7 rounded-t-[32px] bg-cream p-5">
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-[20px] bg-[#EEEBD6] p-4"><div className="mb-3 flex items-center justify-between"><span className="grid h-10 w-10 place-items-center rounded-full bg-white"><Clock size={18} {...ICON} /></span></div><div className="text-4xl font-extrabold tracking-tight">{hours.toFixed(1)} <span className="text-lg font-bold">hours</span></div><div className="text-xs font-medium text-ink/60">spent this month</div></div>
           <div className="rounded-[20px] bg-gold p-4"><div className="mb-3 flex items-center justify-between"><span className="grid h-10 w-10 place-items-center rounded-full bg-white/60"><BookOpen size={18} {...ICON} /></span></div><div className="text-4xl font-extrabold tracking-tight">{passed} <span className="text-lg font-bold">lessons</span></div><div className="text-xs font-medium text-ink/70">passed of {lessons.length} in {rec.module.skill}</div></div>
@@ -101,14 +101,14 @@ export default function Dashboard() {
           <div className="mt-3 text-lg font-bold">Total Score</div>
           <div className="mt-1 flex items-center gap-3">
             <span className="grid h-12 w-12 place-items-center rounded-full bg-gold shadow-[inset_0_-4px_0_rgba(0,0,0,.15)]"><Star size={22} fill="#141416" {...ICON} /></span>
-            <motion.span key={s.xp} initial={{ scale: 1.08 }} animate={{ scale: 1 }} transition={spring} className="text-5xl font-extrabold tracking-tight tabnum">{s.xp.toLocaleString('en-US').replace(',', ' ')}</motion.span>
+            <motion.span key={s.xp} initial={{ scale: 1.08 }} animate={{ scale: 1 }} transition={spring} className="whitespace-nowrap text-4xl font-extrabold tracking-tight tabnum 2xl:text-5xl">{s.xp.toLocaleString('en-US').replace(',', ' ')}</motion.span>
             <span className="-mt-8 rounded-full bg-forest px-3 py-1 text-xs font-bold text-white">{new Date().toLocaleDateString(undefined, { month: 'long' })}</span>
           </div>
           <div className="mt-1 pl-15 text-xs font-semibold text-ink/50">XP</div>
         </Bento>
         <Bento className="bg-coral text-white">
           <div className="text-xl font-bold">Bonus Streak for 7 Days</div>
-          <div className="mt-4 flex justify-between">{[1, 2, 3, 4, 5, 6, 7].map((d) => <Coin key={d} label={`${d}D`} done={d <= streakLive} today={d === streakLive + 1 && !claimedToday} />)}</div>
+          <div className="mt-4 grid grid-cols-7 gap-1">{[1, 2, 3, 4, 5, 6, 7].map((d) => <Coin key={d} label={`${d}D`} done={d <= streakLive} today={d === streakLive + 1 && !claimedToday} />)}</div>
           <motion.button whileTap={{ scale: 0.97 }} whileHover={{ y: -2 }} transition={spring} disabled={claimedToday} onClick={() => { if (s.claim()) { setToast(`+${50 + (streakLive >= 7 ? 1 : streakLive + 1) * 10} XP claimed`); setTimeout(() => setToast(''), 2400) } }}
             className="mt-5 min-h-12 w-full rounded-full bg-white text-sm font-bold text-ink disabled:opacity-70">{claimedToday ? 'Reward claimed — come back tomorrow' : 'Claim Daily Practice Reward'}</motion.button>
         </Bento>

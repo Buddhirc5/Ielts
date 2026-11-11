@@ -15,7 +15,7 @@ function Slider({ label, value, set, min, max, step, fmt }: { label: string; val
 function History() {
   const attempts = useStore((s) => s.attempts)
   if (attempts.length < 2) return <p className="text-sm text-ink/60">Complete two or more tests to see your band trend.</p>
-  const W = 560, H = 220, L = 30, B = 26, T = 12, R = 12
+  const W = 560, H = 220, L = 30, B = 26, T = 12, R = 28
   const x = (i: number) => L + (i * (W - L - R)) / (attempts.length - 1), y = (b: number) => T + (1 - (b - 4) / 5) * (H - T - B)
   return (
     <div>
@@ -36,7 +36,7 @@ export default function Analytics() {
   const lastRaw = (k: 'listening' | 'reading') => { const a = [...s.attempts].reverse().find((x) => x.raw?.[k]); return a ? Math.round((a.raw![k]![0] / a.raw![k]![1]) * 40) : 28 }
   const [lRaw, setL] = useState(lastRaw('listening')), [rRaw, setR] = useState(lastRaw('reading')), [w, setW] = useState(bands.writing), [sp, setSp] = useState(bands.speaking)
   const lB = rawToBand('listening', s.track, lRaw), rB = rawToBand('reading', s.track, rRaw), ov = overallBand(lB, rB, w, sp), mean = (lB + rB + w + sp) / 4
-  const [target, setTarget] = useState(s.target), [minB, setMinB] = useState(Math.max(5, s.target - 0.5)), [wW, setWW] = useState(Math.max(bands.writing, 6)), [wS, setWS] = useState(Math.max(bands.speaking, 6))
+  const [target, setTarget] = useState(s.target), [minB, setMinB] = useState(Math.max(5, Math.min(s.target - 0.5, bands.writing, bands.speaking))), [wW, setWW] = useState(bands.writing), [wS, setWS] = useState(bands.speaking)
   const sim = whatIf(target, minB, wW, wS, s.track)
   const types = (Object.entries(s.typeStats) as [QType, { correct: number; total: number }][]).filter(([, v]) => v.total).map(([k, v]) => ({ k, acc: v.correct / v.total, total: v.total })).sort((a, b) => a.acc - b.acc)
   const [tab, setTab] = useState<'listening' | 'reading'>('listening')

@@ -172,7 +172,7 @@ export default function Exam({ config }: { config: ExamConfig }) {
     <div className={cx('exam fixed inset-0 z-40 flex flex-col', dark && 'exam-dark')} style={{ fontSize: FONT[font] }}>
       {/* top bar */}
       <header className="panel flex flex-wrap items-center gap-x-3 gap-y-2 border-b px-3 py-2 text-[14px] sm:px-5">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 basis-full sm:basis-0">
           <div className="truncate font-bold">{st.name || 'Candidate'} · <span className="font-semibold opacity-70">No. 004512</span></div>
           <div className="truncate text-xs opacity-70">{config.title} — {sec.kind[0].toUpperCase() + sec.kind.slice(1)}{config.sections.length > 1 ? ` (section ${secIdx + 1} of ${config.sections.length})` : ''}{!strict && ' · Practice mode'}</div>
         </div>

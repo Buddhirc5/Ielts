@@ -78,7 +78,7 @@ export function useAnnotator(ann: Annotations, setAnn: (a: Annotations) => void,
   }
   useEffect(() => { if (!pop) return; const close = (e: MouseEvent) => { if (!(e.target as Element).closest('[data-pop]')) setPop(null) }; document.addEventListener('mousedown', close); return () => document.removeEventListener('mousedown', close) }, [pop])
   const popover = pop && (
-    <div data-pop className="glass fixed z-[70] -translate-x-1/2 -translate-y-full rounded-2xl p-1.5 text-ink" style={{ left: pop.x, top: pop.y }}>
+    <div data-pop className="glass-solid fixed z-[70] -translate-x-1/2 -translate-y-full rounded-2xl p-1.5 text-ink" style={{ left: pop.x, top: pop.y }}>
       {noting ? (
         <form className="flex items-center gap-1" onSubmit={(e) => { e.preventDefault(); apply('yellow', note) }}>
           <input autoFocus value={note} onChange={(e) => setNote(e.target.value)} placeholder="Type a note…" aria-label="Sticky note text" className="h-9 w-44 rounded-xl border border-black/10 bg-white px-3 text-sm text-ink" />
