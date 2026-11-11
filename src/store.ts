@@ -86,7 +86,7 @@ export const useStore = create<State>()(persist((set, get) => ({
   }),
   touch: (key) => set((s) => ({ lastPracticed: { ...s.lastPracticed, [key]: Date.now() } })),
   logMinutes: (m) => set((s) => { const k = dayKey(); return { studyLog: { ...s.studyLog, [k]: Math.round(((s.studyLog[k] || 0) + m) * 10) / 10 } } }),
-  saveEssay: (id, e) => set((s) => ({ essays: { ...s.essays, [id]: { text: '', ...s.essays[id], ...e, updated: Date.now() } } })),
+  saveEssay: (id, e) => set((s) => ({ essays: { ...s.essays, [id]: { ...(s.essays[id] || { text: '' }), ...e, updated: Date.now() } } })),
   addCard: (front, back, source, example) => {
     if (get().deck.some((c) => c.front.toLowerCase() === front.toLowerCase())) return false
     set((s) => ({ deck: [newCard(front, back, source, example), ...s.deck] })); return true
