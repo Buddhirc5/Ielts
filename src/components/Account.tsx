@@ -47,7 +47,7 @@ export function Leaderboard() {
   if (!cloudEnabled) return null
   return (
     <Bento className="bg-white">
-      <div className="mb-3 flex items-center justify-between"><span className="flex items-center gap-2 font-bold"><Crown size={17} {...ICON} /> Live leaderboard</span><span className="flex items-center gap-1.5 text-xs font-semibold text-ink/60"><i className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />live</span></div>
+      <div className="mb-3 flex items-center justify-between"><span className="flex items-center gap-2 font-bold"><Crown size={17} {...ICON} /> Community</span><span className="flex items-center gap-1.5 text-xs font-semibold text-ink/60"><i className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />live</span></div>
       {!session ? <p className="text-sm text-ink/70">Sign in from your profile (top right) to see how your XP compares with other learners.</p>
         : leaders.length === 0 ? <p className="text-sm text-ink/70">No learners yet — you are the first.</p>
         : <ol className="grid gap-1.5">{leaders.map((l, i) => (

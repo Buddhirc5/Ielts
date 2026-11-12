@@ -66,7 +66,6 @@ export default function WritingLab() {
     <div className="grid gap-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="mb-2 flex flex-wrap gap-2">{['#AcademicWriting', '#LexicalResource', '#BandEstimator'].map((t, i) => <Tag key={t} i={i} className={i === 0 ? 'bg-forest text-white' : 'bg-white text-ink'}>{t}</Tag>)}</div>
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Writing Lab</h1>
           <p className="mt-1 max-w-2xl text-sm text-ink/70">Instant, rule-based feedback on the four official criteria as you type. No text leaves your device.</p>
         </div>
@@ -125,7 +124,7 @@ export default function WritingLab() {
           <Bento className="bg-forest text-white">
             <div className="text-sm font-semibold opacity-80">Estimated band {submitted ? '· submitted' : '· live'}</div>
             <motion.div key={a.bands.overall} initial={{ scale: 1.1 }} animate={{ scale: 1 }} transition={spring} className="text-5xl font-extrabold tracking-tight tabnum">{fmtBand(a.bands.overall)}</motion.div>
-            <div className="mt-3 grid gap-2.5">{crit.map(([k, label, band, color]) => <button key={k} onClick={() => setTab(k)} className={cx('rounded-2xl p-2.5 text-left transition', tab === k ? 'bg-white text-ink' : 'bg-white/10')}><Meter label={label} value={band} color={color} /></button>)}</div>
+            <div className="mt-3 grid gap-2.5">{crit.map(([k, label, band, color]) => <button key={k} onClick={() => setTab(k)} className={cx('rounded-2xl p-2.5 text-left transition', tab === k ? 'bg-mint' : '')}><Meter label={label} value={band} color={color} /></button>)}</div>
             <p className="mt-3 text-[11px] opacity-75">A deterministic estimate from measurable features. It cannot judge the quality of your ideas — use it to guide revision.</p>
           </Bento>
           <Bento className="bg-white text-sm">

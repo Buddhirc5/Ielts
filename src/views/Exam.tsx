@@ -242,7 +242,7 @@ export default function Exam({ config }: { config: ExamConfig }) {
 
       {/* bottom palette */}
       {sec.kind !== 'speaking' && (
-        <footer className="panel border-t px-3 py-2 text-[13px] sm:px-5">
+        <footer className="panel safe-b border-t px-3 pt-2 text-[13px] sm:px-5">
           {sec.kind === 'writing' ? (
             <div className="flex gap-2">{([['t1', t1], ['t2', t2]] as const).filter(([, p]) => p).map(([k]) => { const wc = countWords(essay[k]); return <button key={k} onClick={() => setWTask(k)} className={cx('h-11 rounded-xl border px-4 font-bold', wTask === k ? 'border-transparent bg-[var(--ex-accent)] text-[var(--ex-accent-fg)]' : 'border-[var(--ex-border)]')}>Task {k[1]} · {wc} words</button> })}</div>
           ) : (
@@ -321,7 +321,7 @@ function Review({ config, result, answers, essay, onExit, dark, font }: { config
       {tab === 'summary' ? (
         <div className="min-h-0 flex-1 overflow-y-auto bg-canvas p-4 text-ink sm:p-8" style={{ fontSize: 16 }}>
           <div className="mx-auto grid max-w-4xl gap-4">
-            <div className="rounded-[32px] bg-coral p-6 text-white sm:p-8">
+            <div className="card rounded-[24px] p-6 sm:p-8">
               <div className="text-sm font-semibold opacity-90">{result.overall != null ? 'Overall band score' : 'Section results'}</div>
               <div className="text-5xl font-extrabold tracking-tight">{result.overall != null ? fmtBand(result.overall) : Object.values(result.bands).map((b) => fmtBand(b!)).join(' · ')}</div>
               <p className="mt-2 max-w-xl text-sm opacity-95">{result.overall != null ? 'Calculated with the official rounding rule: the mean of the four skills, rounded to the nearest half band.' : config.kind === 'drill' ? 'Drill scores are scaled to a 40-question paper, so treat the band as a rough indicator.' : 'Scores from shorter tests are scaled to a 40-question paper to estimate your band.'}</p>

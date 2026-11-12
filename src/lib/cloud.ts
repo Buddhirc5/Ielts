@@ -1,11 +1,11 @@
-import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js'
+import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { create } from 'zustand'
 import { useStore } from '../store'
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-export const supabase: SupabaseClient | null = url && key ? createClient(url, key) : null
-export const cloudEnabled = !!supabase
+export const cloudEnabled = !!(url && key)
+let supabase: SupabaseClient | null = null
 
 export interface Leader { id: string; display_name: string; xp: number; streak: number; overall: number | null }
 interface Cloud { session: Session | null; status: 'off' | 'signed-out' | 'syncing' | 'synced' | 'error'; error: string; leaders: Leader[]; lastSync: number }
@@ -54,7 +54,9 @@ async function onSignIn(session: Session) {
   await push(); loadLeaders()
 }
 
-if (supabase) {
+// The Supabase library is loaded after first paint so it never delays the opening screen.
+const ready: Promise<void> = !cloudEnabled ? Promise.resolve() : new Promise((res) => setTimeout(res, 300)).then(() => import('@supabase/supabase-js')).then(({ createClient }) => {
+  supabase = createClient(url!, key!)
   supabase.auth.onAuthStateChange((event, session) => {
     // defer: Supabase forbids awaiting its own client inside this callback
     setTimeout(() => {
@@ -66,10 +68,11 @@ if (supabase) {
   useStore.subscribe(() => { if (!useCloud.getState().session || applying) return; clearTimeout(timer); timer = window.setTimeout(push, 2000) })
   window.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { clearTimeout(timer); push() } })
   supabase.channel('ielts-leaderboard').on('postgres_changes', { event: '*', schema: 'public', table: 'ielts_profiles' }, () => loadLeaders()).subscribe()
-}
+})
 
-export async function signIn(email: string, password: string) { const { error } = await supabase!.auth.signInWithPassword({ email, password }); return error?.message || '' }
+export async function signIn(email: string, password: string) { await ready; const { error } = await supabase!.auth.signInWithPassword({ email, password }); return error?.message || '' }
 export async function signUp(email: string, password: string, name: string) {
+  await ready
   const { data, error } = await supabase!.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin, data: { display_name: name } } })
   if (error) return { error: error.message, confirm: false }
   return { error: '', confirm: !data.session }

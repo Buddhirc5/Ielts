@@ -3,6 +3,7 @@ import type { QType, Skill } from '../types'
 import { TYPE_LABEL } from '../types'
 import { minRawFor, overallBand, rawToBand, table, whatIf } from '../lib/engines'
 import { skillBands, useStore } from '../store'
+import { Leaderboard } from '../components/Account'
 import { Bento, Meter, SectionTitle, Tag, cx, fmtBand } from '../components/ui'
 
 const SK: Skill[] = ['listening', 'reading', 'writing', 'speaking']
@@ -43,7 +44,6 @@ export default function Analytics() {
   return (
     <div className="grid gap-6">
       <header>
-        <div className="mb-2 flex flex-wrap gap-2">{['#BandCalculator', '#WhatIf', '#Analytics'].map((t, i) => <Tag key={t} i={i} className={i === 1 ? 'bg-gold text-ink' : 'bg-white text-ink'}>{t}</Tag>)}</div>
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Analytics & Band Calculator</h1>
       </header>
       <div className="grid gap-5 lg:grid-cols-3">
@@ -70,7 +70,7 @@ export default function Analytics() {
             <Slider label="Expected Writing" value={wW} set={setWW} min={4} max={9} step={0.5} fmt={fmtBand} />
             <Slider label="Expected Speaking" value={wS} set={setWS} min={4} max={9} step={0.5} fmt={fmtBand} />
           </div>
-          <div className={cx('mt-4 rounded-[20px] p-4 text-sm', sim.feasible ? 'bg-white' : 'bg-coral text-white')}>
+          <div className={cx('mt-4 rounded-[20px] p-4 text-sm', sim.feasible ? 'bg-cream' : 'bg-butter')}>
             <p className="font-semibold">{sim.message}</p>
             {sim.feasible && <table className="mt-3 w-full text-left"><thead><tr className="text-xs text-ink/50"><th className="py-1 font-semibold">Listening</th><th className="font-semibold">Reading</th><th className="font-semibold">Overall</th></tr></thead>
               <tbody>{sim.combos.map((c, i) => <tr key={i} className={cx('border-t border-black/5', i === 0 && 'font-bold')}><td className="py-2 tabnum">Band {fmtBand(c.l)} <span className="text-ink/60">(≥ {c.lRaw}/40)</span></td><td className="tabnum">Band {fmtBand(c.r)} <span className="text-ink/60">(≥ {c.rRaw}/40)</span></td><td><span className="rounded-full bg-mint px-2 py-0.5 tabnum">{fmtBand(c.overall)}</span></td></tr>)}</tbody></table>}
@@ -79,6 +79,7 @@ export default function Analytics() {
         </Bento>
       </div>
 
+      <Leaderboard />
       <div className="grid gap-5 lg:grid-cols-2">
         <Bento className="bg-white">
           <SectionTitle>Accuracy by question type</SectionTitle>

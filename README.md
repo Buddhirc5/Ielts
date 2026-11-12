@@ -8,6 +8,10 @@ An IELTS preparation and mock-exam web app focused on **IELTS Academic** and Sri
 
 Band estimates for Writing and Speaking are rule-based guides for practice, not official scores. Listening audio uses the browser's speech synthesis, so the available accents depend on the device.
 
+## Cloud sync (Supabase)
+
+Sign-in, cross-device progress sync and the community board use Supabase. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (see `.env.example`); the tables are in `supabase/migrations`. Without the keys the app runs fully offline in the browser.
+
 ## Develop
 
 ```bash

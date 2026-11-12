@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BookOpen, Check, Headphones, Plus, RotateCcw, Trash2, Volume2, X, Trophy } from 'lucide-react'
+import { ArrowRight, Mic, PenLine, BookOpen, Check, Headphones, Plus, RotateCcw, Trash2, Volume2, X, Trophy } from 'lucide-react'
 import { LISTENING } from '../data/listening'
 import { ACADEMIC_READING, GENERAL_READING } from '../data/reading'
 import { QUIZZES, type QuizDef } from '../data/quizzes'
@@ -131,7 +131,7 @@ function Deck() {
   const [all, setAll] = useState(false)
   const due = deck.filter((c) => c.due <= Date.now()).sort((a, b) => a.due - b.due)
   const card = due[0]
-  const grades: [Grade, string][] = [['again', 'bg-coral text-white'], ['hard', 'bg-gold text-ink'], ['good', 'bg-forest text-white'], ['easy', 'bg-ink text-white']]
+  const grades: [Grade, string][] = [['again', 'bg-mint'], ['hard', 'bg-mint'], ['good', 'bg-forest text-white'], ['easy', 'bg-mint']]
   return (
     <section id="deck" className="scroll-mt-24">
       <SectionTitle right={<div className="flex gap-2"><Pill variant="light" onClick={() => setAdding(!adding)}><Plus size={16} {...ICON} /> Add card</Pill></div>}>Band 8+ Lexical Deck & Mistake Bank</SectionTitle>
@@ -170,10 +170,13 @@ export default function Practice() {
   return (
     <div className="grid gap-8">
       <header>
-        <div className="mb-2 flex flex-wrap gap-2">{['#TrueFalseNotGiven', '#Paraphrase', '#ListeningPart1', '#LexicalResource'].map((t, i) => <Tag key={t} i={i} className={i === 0 ? 'bg-coral text-white' : i === 2 ? 'bg-gold text-ink' : 'bg-white text-ink'}>{t}</Tag>)}</div>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Practice & Micro-Quizzes</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Practice</h1>
         <p className="mt-1 max-w-2xl text-sm text-ink/70">Untimed skill practice with speed controls, seven quick-fire quiz games and your spaced-repetition deck.</p>
       </header>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {([['writing', PenLine, 'Writing Lab', 'Instant feedback on the four criteria'], ['speaking', Mic, 'Speaking Simulator', 'Cue cards with pace and pause tracking']] as const).map(([v, Icon, t, d]) => (
+          <button key={v} onClick={() => s.setView(v)} className="card flex min-h-16 items-center gap-4 rounded-[24px] px-5 py-3 text-left"><Icon size={20} className="text-ink/50" {...ICON} /><span className="flex-1"><b className="block">{t}</b><span className="text-sm text-ink/55">{d}</span></span><ArrowRight size={18} className="text-ink/40" {...ICON} /></button>))}
+      </div>
       <section>
         <SectionTitle right={<Pill variant="light" onClick={() => s.startExam(EXAMS.listening('practice'))}><RotateCcw size={15} {...ICON} /> All 4 parts</Pill>}>Listening practice</SectionTitle>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{LISTENING.map((p, i) => (

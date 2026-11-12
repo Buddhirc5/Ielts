@@ -39,32 +39,13 @@ interface State {
   reset: (keepProfile?: boolean) => void
 }
 
-function seed() {
-  const now = Date.now()
-  const studyLog: Record<string, number> = {}
-  // twelve weeks of sample study time so the charts are meaningful on first launch
-  const pattern = [35, 0, 50, 40, 0, 75, 20, 45, 30, 0, 60, 55, 25, 0]
-  for (let i = 1; i <= 84; i++) { const m = pattern[i % pattern.length] + (i % 5) * 4; if (m > 8) studyLog[dayKey(new Date(now - i * DAY))] = m }
-  const attempts: Attempt[] = [
-    { id: 's1', date: now - 21 * DAY, title: 'Express Mock (sample)', kind: 'express', bands: { listening: 6, reading: 5.5 }, raw: { listening: [24, 40], reading: [20, 40] } },
-    { id: 's2', date: now - 12 * DAY, title: 'Mini Mock (sample)', kind: 'mini', bands: { listening: 6.5, reading: 6, writing: 6, speaking: 6 }, raw: { listening: [27, 40], reading: [24, 40] }, overall: 6 },
-    { id: 's3', date: now - 4 * DAY, title: 'Full Mock 1 (sample)', kind: 'full', bands: { listening: 7, reading: 6.5, writing: 6, speaking: 6.5 }, raw: { listening: [30, 40], reading: [28, 40] }, overall: 6.5 },
-  ]
-  return {
-    xp: 34112, streak: 4, lastClaim: dayKey(new Date(now - DAY)), attempts, studyLog,
-    typeStats: { tfng: { correct: 11, total: 19 }, ynng: { correct: 7, total: 12 }, heading: { correct: 8, total: 12 }, gap: { correct: 31, total: 40 }, mcq: { correct: 14, total: 20 }, map: { correct: 8, total: 12 }, match: { correct: 6, total: 8 }, bank: { correct: 7, total: 10 } } as State['typeStats'],
-    lastPracticed: { reading: now - 4 * DAY, listening: now - 2 * DAY, writing: now - 6 * DAY, speaking: now - 9 * DAY } as Record<string, number>,
-    lessonsDone: ['l-pred', 'l-skim', 'l-over', 'l-p1'], quizBest: { 'q-logic': 62 } as Record<string, number>,
-    deck: SEED_VOCAB.map(([f, b, e]) => newCard(f, b, 'Band 8+ deck', e)),
-  }
-}
 const blank = () => ({ xp: 0, streak: 0, lastClaim: '', attempts: [] as Attempt[], studyLog: {} as Record<string, number>, typeStats: {} as State['typeStats'], lastPracticed: {} as Record<string, number>, lessonsDone: [] as string[], quizBest: {} as Record<string, number>, deck: SEED_VOCAB.map(([f, b, e]) => newCard(f, b, 'Band 8+ deck', e)) })
 
 export const useStore = create<State>()(persist((set, get) => ({
   view: 'home', exam: null,
-  onboarded: false, demo: true, name: '', track: 'academic', target: 7, dest: 'uk', examDate: dayKey(new Date(Date.now() + 28 * DAY)),
+  onboarded: false, demo: false, name: '', track: 'academic', target: 7, dest: 'uk', examDate: dayKey(new Date(Date.now() + 28 * DAY)),
   essays: {}, checklist: [], speakingLog: [],
-  ...seed(),
+  ...blank(),
   setView: (view) => { set({ view }); window.scrollTo({ top: 0 }) },
   startExam: (exam) => set({ exam }),
   endExam: () => set({ exam: null }),
@@ -99,7 +80,7 @@ export const useStore = create<State>()(persist((set, get) => ({
   addSpeaking: (sp) => set((s) => ({ speakingLog: [sp, ...s.speakingLog].slice(0, 30) })),
   reset: () => set({ ...blank(), demo: false, essays: {}, checklist: [], speakingLog: [] }),
 }), {
-  name: 'ielts-masterstudio-v1',
+  name: 'ielts-masterstudio-v2',
   partialize: (s) => { const { view: _v, exam: _e, ...rest } = s; return Object.fromEntries(Object.entries(rest).filter(([, v]) => typeof v !== 'function')) as unknown as State },
 }))
 

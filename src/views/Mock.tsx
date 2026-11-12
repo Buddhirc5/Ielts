@@ -1,10 +1,13 @@
 import { BookOpen, Flag, Headphones, Highlighter, Mic, MonitorSmartphone, PenLine, Timer, Type } from 'lucide-react'
+import { useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { EXAMS } from '../lib/exams'
 import { useStore } from '../store'
-import { Bento, CircleBtn, ICON, Pill, SectionTitle, Tag, fmtBand } from '../components/ui'
+import { Breathe, Bento, CircleBtn, ICON, Pill, SectionTitle, Tag, fmtBand } from '../components/ui'
 
 export default function Mock() {
   const s = useStore()
+  const [breathe, setBreathe] = useState(false)
   const sections = [
     { t: 'Listening', d: '4 parts · 40 questions · single play', icon: Headphones, c: 'bg-mint', go: () => s.startExam(EXAMS.listening()) },
     { t: 'Reading', d: `${s.track === 'academic' ? '3 passages' : '3 sections'} · 40 questions · 60 min`, icon: BookOpen, c: 'bg-lav', go: () => s.startExam(EXAMS.reading()) },
@@ -16,10 +19,9 @@ export default function Mock() {
     <div className="grid gap-6">
       <div className="grid gap-5 lg:grid-cols-3">
         <Bento className="bg-coral text-white lg:col-span-2">
-          <div className="flex flex-wrap gap-2">{['#IELTSonComputer', '#FullMock', `#${s.track === 'academic' ? 'Academic' : 'GeneralTraining'}`].map((t, i) => <Tag key={t} i={i} className={i === 1 ? 'bg-ink text-white' : 'bg-white/30 text-white'}>{t}</Tag>)}</div>
           <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Full Mock Exam Mode</h1>
           <p className="mt-2 max-w-xl text-sm opacity-95">A distraction-free simulation of the computer-delivered test: Listening, Reading, Writing and Speaking back to back, with one overall band at the end. Allow about 2 hours 45 minutes.</p>
-          <div className="mt-5 flex flex-wrap items-center gap-3"><Pill variant="light" onClick={() => s.startExam(EXAMS.full(s.track))}><Timer size={16} {...ICON} /> Start full mock</Pill><span className="text-xs font-semibold opacity-90">Use Chrome, Edge or Safari with headphones and a microphone.</span></div>
+          <div className="mt-5 flex flex-wrap items-center gap-3"><Pill variant="light" onClick={() => s.startExam(EXAMS.full(s.track))}><Timer size={16} {...ICON} /> Start full mock</Pill><button onClick={() => setBreathe(true)} className="min-h-11 text-sm font-medium text-ink/60 underline">Take a one-minute breather first</button></div>
         </Bento>
         <Bento className="bg-white">
           <h2 className="font-bold">Inside the exam interface</h2>
@@ -45,6 +47,7 @@ export default function Mock() {
             <tbody>{history.slice(0, 12).map((a) => <tr key={a.id} className="border-t border-black/5"><td className="px-3 py-3 tabnum text-ink/60">{new Date(a.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</td><td className="px-3 py-3 font-semibold">{a.title}</td>{(['listening', 'reading', 'writing', 'speaking'] as const).map((k) => <td key={k} className="px-3 py-3 tabnum">{a.bands[k] != null ? fmtBand(a.bands[k]!) : '—'}</td>)}<td className="px-3 py-3"><span className="rounded-full bg-mint px-2.5 py-1 font-bold tabnum">{a.overall ? fmtBand(a.overall) : '—'}</span></td></tr>)}</tbody></table></div>
         )}
       </section>
+      <AnimatePresence>{breathe && <Breathe onClose={() => setBreathe(false)} />}</AnimatePresence>
     </div>
   )
 }

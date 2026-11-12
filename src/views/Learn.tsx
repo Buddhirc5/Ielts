@@ -16,7 +16,7 @@ const STEPS = [
   { n: 5, title: 'Full Mock Exams', icon: Timer, color: 'bg-mint' }, { n: 6, title: 'Test-Day Readiness', icon: ListChecks, color: 'bg-butter' },
 ]
 const SKILLS: Skill[] = ['listening', 'reading', 'writing', 'speaking']
-const PART_COLORS = ['#EC6B78', '#F5B841', '#3D7A74', '#9C8AE0']
+const PART_COLORS = ['#2F5548', '#3F6F62', '#5C8777', '#7A9C8F']
 
 function LessonSheet({ lesson, onClose }: { lesson: Lesson; onClose: () => void }) {
   const { completeLesson, lessonsDone, logMinutes, touch } = useStore()
@@ -61,7 +61,6 @@ export default function Learn() {
   return (
     <div className="grid gap-6">
       <header>
-        <div className="mb-2 flex flex-wrap gap-2">{['#GuidedCurriculum', '#6Steps', '#IELTSAcademic'].map((t, i) => <Tag key={t} i={i} className={i === 0 ? 'bg-ink text-white' : 'bg-white text-ink'}>{t}</Tag>)}</div>
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Your 6-step roadmap</h1>
         <p className="mt-1 max-w-2xl text-sm text-ink/70">Understand the test, measure your level, build each skill, drill your weak points, sit full mocks, then walk in ready.</p>
       </header>
@@ -139,12 +138,12 @@ export default function Learn() {
             <Bento className="bg-coral text-white">
               <h3 className="text-2xl font-bold tracking-tight">Full Mock Exam — all four skills</h3>
               <p className="mt-1 max-w-xl text-sm opacity-95">Listening (40 questions), Reading (40 questions), Writing Tasks 1 and 2, then Speaking Parts 1–3 — in the computer-delivered interface with highlighting, notes and a question palette.</p>
-              <div className="mt-5 flex flex-wrap gap-2"><Pill variant="light" onClick={() => s.startExam(EXAMS.full(s.track))}>Start full mock</Pill><Pill className="!bg-white/20" onClick={() => s.setView('mock')}>All timed tests</Pill></div>
+              <div className="mt-5 flex flex-wrap gap-2"><Pill variant="light" onClick={() => s.startExam(EXAMS.full(s.track))}>Start full mock</Pill><Pill variant="light" onClick={() => s.setView('mock')}>All timed tests</Pill></div>
             </Bento>
           )}
           {step === 6 && (
             <div className="grid gap-5 lg:grid-cols-3">
-              <Bento className="bg-forest text-white"><Ring value={s.checklist.length / checkItems.length} size={120} stroke={10} color="#F5B841" track="rgba(255,255,255,.2)"><span className="text-3xl font-extrabold tabnum">{Math.round((s.checklist.length / checkItems.length) * 100)}%</span></Ring><h3 className="mt-4 text-xl font-bold">Test-day readiness</h3><p className="mt-1 text-sm opacity-90">{s.checklist.length} of {checkItems.length} items ticked. Requirements vary by test centre — always follow your booking confirmation.</p></Bento>
+              <Bento className="bg-forest text-white"><Ring value={s.checklist.length / checkItems.length} size={120} stroke={10} color="#3F6F62"><span className="text-3xl font-extrabold tabnum">{Math.round((s.checklist.length / checkItems.length) * 100)}%</span></Ring><h3 className="mt-4 text-xl font-bold">Test-day readiness</h3><p className="mt-1 text-sm opacity-90">{s.checklist.length} of {checkItems.length} items ticked. Requirements vary by test centre — always follow your booking confirmation.</p></Bento>
               <div className="grid gap-4 lg:col-span-2">{CHECKLIST.map((g) => (
                 <Bento key={g.group} className="bg-white"><h3 className="mb-2 font-bold">{g.group}</h3>
                   <ul className="grid gap-1">{g.items.map((it) => { const on = s.checklist.includes(it); return (

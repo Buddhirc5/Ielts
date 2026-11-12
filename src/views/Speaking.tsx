@@ -149,7 +149,6 @@ export function SpeakingRunner({ cueId, mode, onFinish }: { cueId: string; mode:
 
   if (!started) return (
     <Bento className="bg-lav">
-      <div className="flex flex-wrap gap-2">{['#CueCard', '#Fluency', '#LexicalResource'].map((t, k) => <Tag key={t} i={k}>{t}</Tag>)}</div>
       <h3 className="mt-4 text-2xl font-bold tracking-tight">{mode === 'full' ? 'Full Speaking test · Parts 1–3' : `Speaking Part ${mode[1]}`}</h3>
       <p className="mt-1 max-w-xl text-sm text-ink/70">The examiner's questions are read aloud. Your microphone is used for the live waveform, pause detection and transcription — audio stays on this device.</p>
       {!rec.srSupported && <p className="mt-3 rounded-2xl bg-white/70 p-3 text-sm">Live transcription is not available in this browser. Recording, the waveform and pause detection still work; for word-level feedback use Chrome, Edge or Safari, or type your answer afterwards.</p>}
@@ -201,7 +200,7 @@ export function SpeakingRunner({ cueId, mode, onFinish }: { cueId: string; mode:
           </Ring>
           <div className="mt-4 flex justify-center gap-2">
             {step.kind === 'prep' ? <Pill onClick={next}><Mic size={16} {...ICON} /> Start speaking now</Pill>
-              : !rec.recording ? <Pill variant="coral" onClick={() => { stopSpeaking(); rec.start() }}><Mic size={16} {...ICON} /> Record answer</Pill>
+              : !rec.recording ? <Pill onClick={() => { stopSpeaking(); rec.start() }}><Mic size={16} {...ICON} /> Record answer</Pill>
               : <Pill onClick={next}><Square size={14} {...ICON} /> {i + 1 >= steps.length ? 'Finish' : 'Next question'}</Pill>}
           </div>
           {step.kind === 'answer' && !rec.recording && <button onClick={next} className="mt-2 min-h-11 text-xs font-semibold underline opacity-60">Skip this question</button>}
@@ -236,7 +235,6 @@ export default function Speaking() {
     <div className="grid gap-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="mb-2 flex flex-wrap gap-2">{['#SpeakingSimulator', '#CueCard', '#Fluency'].map((t, k) => <Tag key={t} i={k} className={k === 1 ? 'bg-coral text-white' : 'bg-white text-ink'}>{t}</Tag>)}</div>
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Speaking Simulator</h1>
           <p className="mt-1 max-w-2xl text-sm text-ink/70">An examiner voice asks the questions; your pace, pauses, fillers and cue-card coverage are measured as you speak.</p>
         </div>

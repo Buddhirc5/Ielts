@@ -7,19 +7,21 @@ export const ICON = { strokeWidth: 1.75 } as const
 export const cx = (...a: (string | false | null | undefined)[]) => a.filter(Boolean).join(' ')
 export const fmtBand = (b: number) => (b ? b.toFixed(1) : '—')
 
+/** Cards are always quiet white surfaces: colour fills passed by older call sites are dropped. */
+const calm = (c: string) => c.replace(/!?\bbg-(mint|lav|butter|coral|forest|cream|gold|white)(\/\d+)?\b/g, '').replace(/\btext-white\b/g, '')
 export function Bento({ className = '', children, onClick, ...rest }: HTMLMotionProps<'div'> & { children: ReactNode }) {
   return (
-    <motion.div layout="position" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={spring}
-      whileHover={onClick ? { y: -3, scale: 1.005 } : undefined} whileTap={onClick ? { scale: 0.985 } : undefined}
+    <motion.div layout="position" initial={false} transition={spring}
+      whileHover={onClick ? { y: -2 } : undefined} whileTap={onClick ? { scale: 0.985 } : undefined}
       onClick={onClick} role={onClick ? 'button' : undefined} tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => { if (e.key === 'Enter') (onClick as any)(e) } : undefined}
-      className={cx('relative overflow-hidden rounded-[28px] p-5 sm:p-6', onClick && 'cursor-pointer', className)} {...rest}>
+      className={cx('card relative overflow-hidden rounded-[24px] p-5 sm:p-6', onClick && 'cursor-pointer', calm(className))} {...rest}>
       {children}
     </motion.div>
   )
 }
 export function Pill({ children, onClick, variant = 'dark', className = '', disabled, type = 'button' }: { children: ReactNode; onClick?: () => void; variant?: 'dark' | 'light' | 'ghost' | 'coral'; className?: string; disabled?: boolean; type?: 'button' | 'submit' }) {
-  const v = { dark: 'bg-ink text-white shadow-[0_6px_16px_rgba(20,20,22,.18)]', light: 'bg-white text-ink border border-black/5 shadow-sm', ghost: 'bg-black/5 text-ink', coral: 'bg-coral text-white' }[variant]
+  const v = { dark: 'bg-ink text-white', light: 'bg-white text-ink border border-black/10', ghost: 'bg-black/5 text-ink', coral: 'bg-ink text-white' }[variant]
   return (
     <motion.button type={type} disabled={disabled} onClick={onClick} whileHover={disabled ? undefined : { y: -2 }} whileTap={disabled ? undefined : { scale: 0.96 }} transition={spring}
       className={cx('inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold disabled:opacity-40', v, className)}>
@@ -29,18 +31,17 @@ export function Pill({ children, onClick, variant = 'dark', className = '', disa
 }
 export function CircleBtn({ onClick, icon, label, className = '', ring }: { onClick?: () => void; icon?: ReactNode; label: string; className?: string; ring?: boolean }) {
   return (
-    <motion.button aria-label={label} title={label} onClick={onClick ? (e) => { e.stopPropagation(); onClick() } : undefined} whileHover={{ scale: 1.08, rotate: -6 }} whileTap={{ scale: 0.92 }} transition={spring}
+    <motion.button aria-label={label} title={label} onClick={onClick ? (e) => { e.stopPropagation(); onClick() } : undefined} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }} transition={spring}
       className={cx('relative grid h-11 w-11 shrink-0 place-items-center rounded-full border border-black/10 bg-white text-ink', className)}>
-      {ring && <span className="absolute -inset-1 rounded-full border-2 border-transparent border-r-lavdeep border-t-lavdeep" />}
+      
       {icon ?? <ArrowRight size={18} {...ICON} />}
     </motion.button>
   )
 }
 export const UpRight = ({ onClick, label = 'Open' }: { onClick?: () => void; label?: string }) => <CircleBtn onClick={onClick} label={label} icon={<ArrowUpRight size={18} {...ICON} />} />
 
-const ROT = ['-rotate-3', 'rotate-2', 'rotate-6', '-rotate-6', 'rotate-3']
-export function Tag({ children, i = 0, className = 'bg-white/70 text-ink' }: { children: ReactNode; i?: number; className?: string }) {
-  return <span className={cx('inline-block rounded-full px-3.5 py-1 text-xs font-semibold shadow-sm', ROT[i % ROT.length], className)}>{children}</span>
+export function Tag({ children }: { children: ReactNode; i?: number; className?: string }) {
+  return <span className="inline-block text-xs font-semibold text-ink/45">{children}</span>
 }
 export function BandBadge({ band, className = '' }: { band: number; className?: string }) {
   return <span className={cx('inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-ink shadow-sm', className)}><Star size={13} {...ICON} /> Band {fmtBand(band)}</span>
@@ -89,9 +90,9 @@ export function StripedBars({ data, height = 220 }: { data: { label: string; pct
         const h = Math.max(0.2, Math.min(1, d.pct / 100))
         return (
           <div key={d.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
-            <div className="hatch relative w-full max-w-24 rounded-full bg-white/50" style={{ height }}>
-              <motion.div initial={{ height: 0 }} animate={{ height: `${h * 100}%` }} transition={{ ...spring, delay: i * 0.05 }} className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-center rounded-full" style={{ background: d.color }}>
-                <span className="absolute -top-3 rounded-full bg-ink px-2.5 py-1 text-[11px] font-bold text-white tabnum">{Math.round(d.pct)}%</span>
+            <div className="relative w-full max-w-20 rounded-full bg-black/[.04]" style={{ height }}>
+              <motion.div initial={{ height: 0 }} animate={{ height: `${h * 100}%` }} transition={{ ...spring, delay: i * 0.05 }} className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-center rounded-full bg-forest/20">
+                
                 <span className="text-lg font-extrabold leading-none tracking-tight text-ink">{d.value}</span>
                 {d.sub && <span className="text-[11px] font-medium text-ink/70">{d.sub}</span>}
               </motion.div>
@@ -103,19 +104,19 @@ export function StripedBars({ data, height = 220 }: { data: { label: string; pct
     </div>
   )
 }
-export function Meter({ value, max = 9, color = '#141416', label, right }: { value: number; max?: number; color?: string; label: string; right?: string }) {
+export function Meter({ value, max = 9, label, right }: { value: number; max?: number; color?: string; label: string; right?: string }) {
   return (
     <div>
       <div className="mb-1 flex justify-between text-sm"><span className="font-semibold">{label}</span><span className="font-bold tabnum">{right ?? fmtBand(value)}</span></div>
-      <div className="hatch h-3 overflow-hidden rounded-full bg-black/5"><motion.div className="h-full rounded-full" style={{ background: color }} initial={{ width: 0 }} animate={{ width: `${(value / max) * 100}%` }} transition={spring} /></div>
+      <div className="h-2 overflow-hidden rounded-full bg-black/[.06]"><motion.div className="h-full rounded-full bg-forest" initial={{ width: 0 }} animate={{ width: `${(value / max) * 100}%` }} transition={spring} /></div>
     </div>
   )
 }
 export function Sheet({ children, onClose, wide }: { children: ReactNode; onClose: () => void; wide?: boolean }) {
   return (
-    <motion.div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 backdrop-blur-sm sm:items-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+    <motion.div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
       <motion.div role="dialog" aria-modal="true" initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} transition={spring} onClick={(e) => e.stopPropagation()}
-        className={cx('max-h-[92vh] w-full overflow-y-auto rounded-t-[32px] bg-cream shadow-2xl no-scrollbar sm:rounded-[32px]', wide ? 'sm:max-w-3xl' : 'sm:max-w-lg')}>
+        className={cx('max-h-[92vh] w-full overflow-y-auto safe-b rounded-t-[28px] bg-cream shadow-2xl no-scrollbar sm:rounded-[28px]', wide ? 'sm:max-w-3xl' : 'sm:max-w-lg')}>
         {children}
       </motion.div>
     </motion.div>
@@ -151,5 +152,19 @@ export function Coin({ done, label, today }: { done: boolean; label: string; tod
       </motion.div>
       <span className="text-[11px] font-semibold text-white/90">{label}</span>
     </div>
+  )
+}
+
+/** One-minute paced breathing (4 s in, 6 s out) — a quick way to lower arousal before a test. */
+export function Breathe({ onClose }: { onClose: () => void }) {
+  return (
+    <motion.div role="dialog" aria-modal="true" aria-label="One-minute breathing exercise" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[90] grid place-items-center bg-canvas p-6 text-center">
+      <div>
+        <div className="mx-auto grid h-56 w-56 place-items-center rounded-full border border-forest/20"><div className="h-full w-full rounded-full bg-forest/25" style={{ animation: 'breathe 10s ease-in-out infinite' }} /></div>
+        <p className="mt-8 text-xl font-semibold">Breathe in as the circle grows.<br />Breathe out as it shrinks.</p>
+        <p className="mt-2 text-sm text-ink/60">Six slow breaths is about one minute.</p>
+        <Pill className="mt-8" onClick={onClose}>I'm ready</Pill>
+      </div>
+    </motion.div>
   )
 }
