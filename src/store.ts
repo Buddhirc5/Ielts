@@ -4,7 +4,10 @@ import type { QType, Skill, Track } from './types'
 import { newCard, sm2, type Card, type Grade } from './lib/engines'
 import { SEED_VOCAB } from './data/vocab'
 
-export type View = 'home' | 'learn' | 'practice' | 'writing' | 'speaking' | 'mock' | 'analytics'
+export type View = 'home' | 'learn' | 'practice' | 'writing' | 'speaking' | 'mock' | 'analytics' | 'admin'
+export type Theme = 'system' | 'light' | 'dark'
+/** Set by the cloud module; lets store actions report activity without importing it. */
+export const hooks: { track: (type: string, meta?: Record<string, unknown>) => void } = { track: () => {} }
 export type Section =
   | { kind: 'listening'; parts: number[]; minutes: number; filter?: QType[] }
   | { kind: 'reading'; passages: number[]; minutes: number; filter?: QType[] }
@@ -20,13 +23,14 @@ const DAY = 86400000
 
 interface State {
   view: View; exam: ExamConfig | null
+  theme: Theme; dailyGoal: number; showOnBoard: boolean
   onboarded: boolean; demo: boolean; name: string; track: Track; target: number; dest: string; examDate: string
   xp: number; streak: number; lastClaim: string
   attempts: Attempt[]; typeStats: Partial<Record<QType, { correct: number; total: number }>>; lastPracticed: Record<string, number>
   essays: Record<string, Essay>; deck: Card[]; lessonsDone: string[]; checklist: string[]; quizBest: Record<string, number>
   studyLog: Record<string, number>; speakingLog: SpeakingLog[]
   setView: (v: View) => void; startExam: (e: ExamConfig) => void; endExam: () => void
-  setProfile: (p: Partial<Pick<State, 'name' | 'track' | 'target' | 'dest' | 'examDate' | 'onboarded'>>) => void
+  setProfile: (p: Partial<Pick<State, 'name' | 'track' | 'target' | 'dest' | 'examDate' | 'onboarded' | 'theme' | 'dailyGoal' | 'showOnBoard'>>) => void
   addXp: (n: number) => void; claim: () => boolean
   saveAttempt: (a: Omit<Attempt, 'id' | 'date'>) => void
   recordTypes: (r: Partial<Record<QType, { correct: number; total: number }>>) => void
@@ -43,6 +47,7 @@ const blank = () => ({ xp: 0, streak: 0, lastClaim: '', attempts: [] as Attempt[
 
 export const useStore = create<State>()(persist((set, get) => ({
   view: 'home', exam: null,
+  theme: 'system', dailyGoal: 15, showOnBoard: true,
   onboarded: false, demo: false, name: '', track: 'academic', target: 7, dest: 'uk', examDate: dayKey(new Date(Date.now() + 28 * DAY)),
   essays: {}, checklist: [], speakingLog: [],
   ...blank(),
@@ -59,12 +64,12 @@ export const useStore = create<State>()(persist((set, get) => ({
     set({ streak, lastClaim: today, xp: s.xp + 50 + streak * 10 })
     return true
   },
-  saveAttempt: (a) => set((s) => ({ attempts: [...s.attempts, { ...a, id: Math.random().toString(36).slice(2), date: Date.now() }] })),
-  recordTypes: (r) => set((s) => {
+  saveAttempt: (a) => { hooks.track(a.kind === 'writing' ? 'writing_submit' : 'test_complete', { kind: a.kind, title: a.title, bands: a.bands, overall: a.overall ?? null }); set((s) => ({ attempts: [...s.attempts, { ...a, id: Math.random().toString(36).slice(2), date: Date.now() }] })) },
+  recordTypes: (r) => { if (Object.keys(r).length) hooks.track('answers', r as Record<string, unknown>); set((s) => {
     const typeStats = { ...s.typeStats }
     for (const [k, v] of Object.entries(r) as [QType, { correct: number; total: number }][]) { const o = typeStats[k] || { correct: 0, total: 0 }; typeStats[k] = { correct: o.correct + v.correct, total: o.total + v.total } }
     return { typeStats }
-  }),
+  }) },
   touch: (key) => set((s) => ({ lastPracticed: { ...s.lastPracticed, [key]: Date.now() } })),
   logMinutes: (m) => set((s) => { const k = dayKey(); return { studyLog: { ...s.studyLog, [k]: Math.round(((s.studyLog[k] || 0) + m) * 10) / 10 } } }),
   saveEssay: (id, e) => set((s) => ({ essays: { ...s.essays, [id]: { ...(s.essays[id] || { text: '' }), ...e, updated: Date.now() } } })),
@@ -74,10 +79,10 @@ export const useStore = create<State>()(persist((set, get) => ({
   },
   reviewCard: (id, g) => set((s) => ({ deck: s.deck.map((c) => (c.id === id ? sm2(c, g) : c)), xp: s.xp + 5 })),
   removeCard: (id) => set((s) => ({ deck: s.deck.filter((c) => c.id !== id) })),
-  completeLesson: (id) => set((s) => (s.lessonsDone.includes(id) ? {} : { lessonsDone: [...s.lessonsDone, id], xp: s.xp + 40 })),
+  completeLesson: (id) => { if (!get().lessonsDone.includes(id)) hooks.track('lesson_complete', { id }); set((s) => (s.lessonsDone.includes(id) ? {} : { lessonsDone: [...s.lessonsDone, id], xp: s.xp + 40 })) },
   toggleCheck: (id) => set((s) => ({ checklist: s.checklist.includes(id) ? s.checklist.filter((x) => x !== id) : [...s.checklist, id] })),
-  setQuizBest: (id, score) => set((s) => ({ quizBest: { ...s.quizBest, [id]: Math.max(s.quizBest[id] || 0, score) } })),
-  addSpeaking: (sp) => set((s) => ({ speakingLog: [sp, ...s.speakingLog].slice(0, 30) })),
+  setQuizBest: (id, score) => { hooks.track('quiz_complete', { id, score }); set((s) => ({ quizBest: { ...s.quizBest, [id]: Math.max(s.quizBest[id] || 0, score) } })) },
+  addSpeaking: (sp) => { hooks.track('speaking_complete', { label: sp.label, band: sp.band, wpm: sp.wpm }); set((s) => ({ speakingLog: [sp, ...s.speakingLog].slice(0, 30) })) },
   reset: () => set({ ...blank(), demo: false, essays: {}, checklist: [], speakingLog: [] }),
 }), {
   name: 'ielts-masterstudio-v2',

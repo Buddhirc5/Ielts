@@ -1,7 +1,8 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, BarChart3, BookOpen, Gamepad2, Home, Timer, User, type LucideIcon } from 'lucide-react'
-import { useStore, type View } from './store'
+import { useStore, type Theme, type View } from './store'
+import { isAdmin, useCloud } from './lib/cloud'
 import { DESTINATIONS } from './data/curriculum'
 import { Books, ICON, Pill, Segmented, Sheet, cx, spring } from './components/ui'
 import { AccountPanel, SyncDot } from './components/Account'
@@ -15,6 +16,7 @@ const Speaking = lazy(() => import('./views/Speaking'))
 const Mock = lazy(() => import('./views/Mock'))
 const Analytics = lazy(() => import('./views/Analytics'))
 const Exam = lazy(() => import('./views/Exam'))
+const Admin = lazy(() => import('./views/Admin'))
 
 const TABS: { id: View; label: string; icon: LucideIcon }[] = [
   { id: 'home', label: 'Today', icon: Home }, { id: 'learn', label: 'Learn', icon: BookOpen }, { id: 'practice', label: 'Practice', icon: Gamepad2 },
@@ -66,12 +68,20 @@ function Onboarding() {
 }
 
 export default function App() {
-  const { view, setView, exam, onboarded, track, setProfile, name, reset } = useStore()
+  const { view, setView, exam, onboarded, track, setProfile, name, reset, theme, dailyGoal } = useStore()
   const [profile, setProfile2] = useState(false)
+  const admin = isAdmin(useCloud((c) => c.session))
+  const recovery = useCloud((c) => c.recovery)
+  useEffect(() => { if (recovery) setProfile2(true) }, [recovery])
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const apply = () => { const dark = theme === 'dark' || (theme === 'system' && mq.matches); document.documentElement.classList.toggle('dark', dark); document.querySelector('meta[name=theme-color]')?.setAttribute('content', dark ? '#121314' : '#F6F7F4') }
+    apply(); mq.addEventListener('change', apply); return () => mq.removeEventListener('change', apply)
+  }, [theme])
   useEffect(() => { document.body.style.overflow = exam ? 'hidden' : '' }, [exam])
   if (!onboarded) return <Onboarding />
   if (exam) return <Suspense fallback={<div className="grid h-[100dvh] place-items-center text-ink/40">Loading test…</div>}><Exam key={exam.id + exam.title} config={exam} /></Suspense>
-  const V = { home: Dashboard, learn: Learn, practice: Practice, writing: WritingLab, speaking: Speaking, mock: Mock, analytics: Analytics }[view]
+  const V = { home: Dashboard, learn: Learn, practice: Practice, writing: WritingLab, speaking: Speaking, mock: Mock, analytics: Analytics, admin: Admin }[view]
   const active = tabOf(view)
   return (
     <div className="mx-auto max-w-6xl px-4 pb-28 pt-3 sm:px-6 lg:pb-12">
@@ -80,7 +90,7 @@ export default function App() {
           ? <button onClick={() => setView('practice')} className="flex min-h-11 items-center gap-1.5 pr-2 font-semibold"><ArrowLeft size={18} {...ICON} /> Practice</button>
           : <button onClick={() => setView('home')} className="text-base font-bold tracking-tight" aria-label="IELTS MasterStudio home">MasterStudio</button>}
         <nav className="mx-auto hidden items-center gap-1 lg:flex" aria-label="Main">
-          {TABS.map((t) => <button key={t.id} onClick={() => setView(t.id)} aria-current={active === t.id ? 'page' : undefined} className={cx('min-h-10 rounded-full px-4 text-sm font-medium transition-colors', active === t.id ? 'bg-ink text-white' : 'text-ink/60 hover:text-ink')}>{t.label}</button>)}
+          {[...TABS, ...(admin ? [{ id: 'admin' as View, label: 'Admin' }] : [])].map((t) => <button key={t.id} onClick={() => setView(t.id)} aria-current={active === t.id ? 'page' : undefined} className={cx('min-h-10 rounded-full px-4 text-sm font-medium transition-colors', active === t.id ? 'bg-ink text-white' : 'text-ink/60 hover:text-ink')}>{t.label}</button>)}
         </nav>
         <button onClick={() => setProfile2(true)} aria-label="Profile and settings" className="card relative ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full font-semibold lg:ml-0">{name ? name[0].toUpperCase() : <User size={18} {...ICON} />}<SyncDot /></button>
       </header>
@@ -96,8 +106,10 @@ export default function App() {
         {profile && (
           <Sheet onClose={() => setProfile2(false)}>
             <div className="grid gap-6 p-6">
-              <AccountPanel />
+              <AccountPanel onAdmin={() => { setProfile2(false); setView('admin') }} />
               <div><h2 className="mb-4 text-xl font-bold tracking-tight">Your goal</h2><ProfileForm onDone={() => setProfile2(false)} cta="Save" /></div>
+              <div className="grid gap-2 text-sm"><span className="font-semibold">Appearance</span><Segmented value={theme} onChange={(t: Theme) => setProfile({ theme: t })} options={[{ value: 'system', label: 'Auto' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></div>
+              <div className="grid gap-2 text-sm"><span className="font-semibold">Daily goal</span><Segmented value={String(dailyGoal)} onChange={(g) => setProfile({ dailyGoal: +g })} options={[{ value: '10', label: '10 min' }, { value: '15', label: '15 min' }, { value: '30', label: '30 min' }]} /><span className="text-xs text-ink/50">Small goals you actually reach beat big ones you skip.</span></div>
               <div className="grid gap-2 text-sm"><span className="font-semibold">Test type</span><Segmented value={track} onChange={(t) => setProfile({ track: t })} options={[{ value: 'academic', label: 'Academic' }, { value: 'general', label: 'General Training' }]} /></div>
               <button onClick={() => { if (window.confirm('Clear all progress, essays and results on this device?')) { reset(); setProfile2(false) } }} className="min-h-11 justify-self-start text-sm font-medium text-ink/50 underline">Reset my progress</button>
             </div>

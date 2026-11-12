@@ -16,7 +16,7 @@ function Heatmap({ text, a, onPick }: { text: string; a: Analysis; onPick: (t: T
   let pos = 0
   a.lr.tokens.forEach((t, i) => {
     if (t.start > pos) out.push(text.slice(pos, t.start))
-    const cls = cx(t.level === 'c1' && 'bg-[#C9BDF0] rounded px-0.5', t.level === 'b2' && 'bg-[#BFE3DA] rounded px-0.5', t.weak && 'rounded bg-[#F8C9CE] px-0.5 underline decoration-coral decoration-2 underline-offset-2', t.repeated && !t.weak && 'underline decoration-gold decoration-dotted decoration-2 underline-offset-2')
+    const cls = cx(t.level === 'c1' && 'bg-[#C9BDF0] text-[#1C1C1E] rounded px-0.5', t.level === 'b2' && 'bg-[#BFE3DA] text-[#1C1C1E] rounded px-0.5', t.weak && 'rounded bg-[#F5DDBB] text-[#1C1C1E] px-0.5 underline decoration-coral decoration-2 underline-offset-2', t.repeated && !t.weak && 'underline decoration-gold decoration-dotted decoration-2 underline-offset-2')
     out.push(t.weak || t.repeated ? <button key={i} className={cx(cls, 'cursor-pointer')} onClick={(e) => { const r = (e.target as HTMLElement).getBoundingClientRect(); onPick(t, r.left + r.width / 2, r.bottom) }}>{t.text}</button> : cls ? <span key={i} className={cls}>{t.text}</span> : t.text)
     pos = t.end
   })
@@ -109,7 +109,7 @@ export default function WritingLab() {
             </div>
             {mode === 'write'
               ? <textarea value={text} onChange={(e) => { setText(e.target.value); setSubmitted(false) }} spellCheck={false} aria-label="Your answer" placeholder={phase === 'outline' ? 'Finish your outline first — or start typing when you are ready.' : 'Write your answer here. Feedback updates as you type.'} className="min-h-96 w-full resize-y rounded-[20px] border border-black/10 bg-white p-4 leading-relaxed" />
-              : text.trim() ? <><Heatmap text={text} a={a} onPick={(t, x, y) => setPop({ t, x: Math.min(window.innerWidth - 150, Math.max(150, x)), y })} /><div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold">{[['#BFE3DA', 'Upper-intermediate (B2)'], ['#C9BDF0', 'Advanced / academic (C1–C2)'], ['#F8C9CE', 'Weak or vague — tap to upgrade']].map(([c, l]) => <span key={l} className="inline-flex items-center gap-1.5"><i className="h-3 w-3 rounded" style={{ background: c }} />{l}</span>)}<span className="underline decoration-gold decoration-dotted decoration-2 underline-offset-2">Repeated 3+ times</span></div></>
+              : text.trim() ? <><Heatmap text={text} a={a} onPick={(t, x, y) => setPop({ t, x: Math.min(window.innerWidth - 150, Math.max(150, x)), y })} /><div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold">{[['#BFE3DA', 'Upper-intermediate (B2)'], ['#C9BDF0', 'Advanced / academic (C1–C2)'], ['#F5DDBB', 'Weak or vague — tap to upgrade']].map(([c, l]) => <span key={l} className="inline-flex items-center gap-1.5"><i className="h-3 w-3 rounded" style={{ background: c }} />{l}</span>)}<span className="underline decoration-gold decoration-dotted decoration-2 underline-offset-2">Repeated 3+ times</span></div></>
               : <div className="grid min-h-72 place-items-center rounded-[20px] bg-white p-6 text-center text-sm text-ink/50"><div><Eye className="mx-auto mb-2" {...ICON} />Write a few sentences to see every word classified by level.</div></div>}
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
               <div className="text-sm font-bold">Words: <span className={a.words < a.minWords ? 'text-rose-600' : 'text-emerald-700'}>{a.words}</span><span className="font-medium text-ink/50"> / {a.minWords} minimum</span>{a.ta.wordPenalty && a.words > 0 && <span className="ml-2 rounded-full bg-coral/15 px-2 py-0.5 text-xs text-rose-700">under-length penalty</span>}</div>
@@ -121,10 +121,10 @@ export default function WritingLab() {
 
         {/* diagnostics column */}
         <div className="grid content-start gap-4 xl:col-span-3">
-          <Bento className="bg-forest text-white">
+          <Bento tone="sage">
             <div className="text-sm font-semibold opacity-80">Estimated band {submitted ? '· submitted' : '· live'}</div>
             <motion.div key={a.bands.overall} initial={{ scale: 1.1 }} animate={{ scale: 1 }} transition={spring} className="text-5xl font-extrabold tracking-tight tabnum">{fmtBand(a.bands.overall)}</motion.div>
-            <div className="mt-3 grid gap-2.5">{crit.map(([k, label, band, color]) => <button key={k} onClick={() => setTab(k)} className={cx('rounded-2xl p-2.5 text-left transition', tab === k ? 'bg-mint' : '')}><Meter label={label} value={band} color={color} /></button>)}</div>
+            <div className="mt-3 grid gap-2.5">{crit.map(([k, label, band, color]) => <button key={k} onClick={() => setTab(k)} className={cx('rounded-2xl p-2.5 text-left transition', tab === k ? 'bg-white' : '')}><Meter label={label} value={band} color={color} /></button>)}</div>
             <p className="mt-3 text-[11px] opacity-75">A deterministic estimate from measurable features. It cannot judge the quality of your ideas — use it to guide revision.</p>
           </Bento>
           <Bento className="bg-white text-sm">

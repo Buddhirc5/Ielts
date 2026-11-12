@@ -2,24 +2,62 @@
 
 @theme {
   --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', 'Segoe UI', Roboto, sans-serif;
-  --color-canvas: #F7F7F4;
-  --color-cream: #FAFAF8;
-  --color-lav: #F2F3EF;
-  --color-lavdeep: #D8DAD3;
-  --color-mint: #F2F3EF;
-  --color-butter: #F2F3EF;
-  --color-coral: #B8654F;
-  --color-gold: #E3B866;
-  --color-forest: #3F6F62;
+  /* Surfaces and text flip in dark mode; see .dark below. */
+  --color-white: #FFFFFF;
+  --color-black: #1C1C1E;
   --color-ink: #1C1C1E;
+  --color-canvas: #F6F7F4;
+  --color-cream: #FAFBF9;
+  /* Soft, low-arousal tints: green and blue calm, sand warms, lilac for speaking. */
+  --color-mint: #E4EFE9;
+  --color-sky: #E1EBF3;
+  --color-butter: #F4ECDD;
+  --color-lav: #EAE6F2;
+  --color-lavdeep: #CFC8DD;
+  --color-forest: #3F7566;
+  --color-coral: #B9742B;
+  --color-gold: #E3B866;
+  /* "Not yet" is amber, never alarm red. */
+  --color-rose-50: #FAF1E2;
+  --color-rose-500: #D08A3C;
+  --color-rose-600: #B9742B;
+  --color-rose-700: #9A5F20;
+  --color-rose-800: #7E4D19;
+  --color-emerald-50: #E4F0EA;
+  --color-emerald-500: #4E9B82;
+  --color-emerald-600: #3F7F6A;
+  --color-emerald-700: #336856;
+}
+.dark {
+  color-scheme: dark;
+  --color-white: #1D1F21;
+  --color-black: #FFFFFF;
+  --color-ink: #ECEDE8;
+  --color-canvas: #121314;
+  --color-cream: #17191A;
+  --color-mint: #1F2E29;
+  --color-sky: #1E2A35;
+  --color-butter: #2F2A1F;
+  --color-lav: #29263A;
+  --color-lavdeep: #4A4560;
+  --color-forest: #86BFAE;
+  --color-coral: #E0A862;
+  --color-rose-50: #33291A;
+  --color-rose-500: #E0A862;
+  --color-rose-600: #E6B477;
+  --color-rose-700: #EEC58F;
+  --color-rose-800: #F3D3A8;
+  --color-emerald-50: #1C2E27;
+  --color-emerald-600: #86BFAE;
+  --color-emerald-700: #9CCDBD;
 }
 
 html, body, #root { height: 100%; }
 body {
   margin: 0;
   font-family: var(--font-sans);
-  color: #1C1C1E;
-  background: #F7F7F4;
+  color: var(--color-ink);
+  background: var(--color-canvas);
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   overscroll-behavior-y: none;
@@ -27,13 +65,14 @@ body {
 /* iOS zooms the page when a focused field is under 16px */
 @media (max-width: 640px) { input, textarea, select { font-size: 16px !important; } }
 .safe-b { padding-bottom: max(.5rem, env(safe-area-inset-bottom)); }
-.card { background: #fff; border: 1px solid rgba(28,28,30,.07); }
+.card { background: var(--color-white); border: 1px solid color-mix(in srgb, var(--color-black) 8%, transparent); }
+.scrim { background: rgba(0,0,0,.45); }
 @keyframes breathe { 0%, 100% { transform: scale(.55); } 40% { transform: scale(1); } }
 button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 button:disabled { cursor: not-allowed; }
-:focus-visible { outline: 2px solid #141416; outline-offset: 2px; border-radius: 8px; }
-.glass { background: #fff; border: 1px solid rgba(28,28,30,.08); box-shadow: 0 4px 16px rgba(28,28,30,.06); }
-.glass-solid { background: #fff; border: 1px solid rgba(20,20,22,.08); box-shadow: 0 12px 32px rgba(20,20,22,.18); }
+:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; border-radius: 8px; }
+.glass { background: var(--color-white); border: 1px solid color-mix(in srgb, var(--color-black) 9%, transparent); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+.glass-solid { background: var(--color-white); color: var(--color-ink); border: 1px solid rgba(20,20,22,.08); box-shadow: 0 12px 32px rgba(20,20,22,.18); }
 .hatch { background-image: repeating-linear-gradient(135deg, rgba(28,28,30,.05) 0 2px, transparent 2px 9px); }
 .hatch-light { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.35) 0 2px, transparent 2px 9px); }
 .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -46,7 +85,7 @@ mark.hl-ev { background: #9BE7C4; color: #0b3b2e; border-radius: 4px; box-shadow
 .pulse-warn { animation: pulse-warn 1s ease-in-out infinite; }
 
 /* Exam mode themes */
-.exam { --ex-bg: #F3F4F6; --ex-panel: #FFFFFF; --ex-fg: #141416; --ex-sub: #5b6170; --ex-border: #D7DAE0; --ex-accent: #141416; --ex-accent-fg: #fff; --ex-field: #fff; background: var(--ex-bg); color: var(--ex-fg); }
+.exam { --ex-bg: #F3F4F6; --ex-panel: #FFFFFF; --ex-fg: #1C1C1E; --ex-sub: #5b6170; --ex-border: #D7DAE0; --ex-accent: #141416; --ex-accent-fg: #fff; --ex-field: #fff; background: var(--ex-bg); color: var(--ex-fg); }
 .exam.exam-dark { --ex-bg: #000; --ex-panel: #0d0d0f; --ex-fg: #FFF36B; --ex-sub: #d6cf7a; --ex-border: #6b6b3a; --ex-accent: #FFF36B; --ex-accent-fg: #000; --ex-field: #000; }
 .exam .panel { background: var(--ex-panel); border-color: var(--ex-border); }
 .exam input[type=text], .exam select, .exam textarea { background: var(--ex-field); color: var(--ex-fg); border: 1px solid var(--ex-border); }

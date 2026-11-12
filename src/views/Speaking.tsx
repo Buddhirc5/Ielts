@@ -23,7 +23,7 @@ function Waveform({ analyser, active }: { analyser: React.RefObject<AnalyserNode
       for (let i = 0; i < bars; i++) {
         const v = data ? data[Math.floor((i / bars) * data.length * 0.6)] / 255 : 0.04
         const h = Math.max(4, v * H * 0.95), x = (i / bars) * W + 2, w = W / bars - 4
-        g.fillStyle = i % 3 === 0 ? '#EC6B78' : '#141416'
+        g.fillStyle = i % 3 === 0 ? '#86BFAE' : '#8A8F8C'
         g.beginPath(); g.roundRect(x, (H - h) / 2, w, h, w / 2); g.fill()
       }
       raf = requestAnimationFrame(draw)
@@ -46,9 +46,9 @@ export function Gauge({ wpm }: { wpm: number }) {
     <div className="text-center">
       <svg viewBox="0 0 200 116" className="mx-auto w-full max-w-60" role="img" aria-label={`Speaking speed ${wpm} words per minute: ${label}`}>
         {arc(60, 100, '#F5B841')}{arc(100, 125, '#FFE08A')}{arc(125, 155, '#3D7A74')}{arc(155, 170, '#FFE08A')}{arc(170, 200, '#EC6B78')}
-        <motion.g animate={{ rotate: angle }} transition={spring} style={{ originX: '100px', originY: '100px', transformBox: 'view-box' }}><path d="M100 100 L100 30" stroke="#141416" strokeWidth="4" strokeLinecap="round" /></motion.g>
-        <circle cx="100" cy="100" r="7" fill="#141416" />
-        <text x="18" y="114" fontSize="9" fill="#141416" opacity=".6">60</text><text x="170" y="114" fontSize="9" fill="#141416" opacity=".6">200</text>
+        <motion.g animate={{ rotate: angle }} transition={spring} style={{ originX: '100px', originY: '100px', transformBox: 'view-box' }}><path d="M100 100 L100 30" stroke="currentColor" strokeWidth="4" strokeLinecap="round" /></motion.g>
+        <circle cx="100" cy="100" r="7" fill="currentColor" />
+        <text x="18" y="114" fontSize="9" fill="currentColor" opacity=".6">60</text><text x="170" y="114" fontSize="9" fill="currentColor" opacity=".6">200</text>
       </svg>
       <div className="text-4xl font-extrabold tracking-tight tabnum">{wpm || '—'}<span className="ml-1 text-sm font-semibold opacity-60">WPM</span></div>
       <div className={cx('mt-1 inline-block rounded-full px-3 py-1 text-xs font-bold', zone === 'optimal' && wpm ? 'bg-forest text-white' : 'bg-black/5')}>{label}</div>
@@ -121,7 +121,7 @@ export function SpeakingRunner({ cueId, mode, onFinish }: { cueId: string; mode:
     const final = manual !== results.map((r) => r.transcript).join(' ').trim() ? scoreSpeaking({ transcript: manual, seconds: results.reduce((a, r) => a + r.seconds, 0), pauses: score.pauses, confidence: null }) : score
     return (
       <div className="grid gap-4 lg:grid-cols-3">
-        <Bento className="bg-forest text-white lg:col-span-1">
+        <Bento tone="lilac" className="lg:col-span-1">
           <div className="text-sm font-semibold opacity-80">Estimated Speaking band</div>
           <div className="text-5xl font-extrabold tracking-tight">{fmtBand(final.overall)}</div>
           <p className="mt-2 text-sm opacity-90">{final.words} words · {final.wpm} WPM · {final.pauses} long pauses · {final.fillerCount} fillers</p>
@@ -148,7 +148,7 @@ export function SpeakingRunner({ cueId, mode, onFinish }: { cueId: string; mode:
   }
 
   if (!started) return (
-    <Bento className="bg-lav">
+    <Bento tone="lilac">
       <h3 className="mt-4 text-2xl font-bold tracking-tight">{mode === 'full' ? 'Full Speaking test · Parts 1–3' : `Speaking Part ${mode[1]}`}</h3>
       <p className="mt-1 max-w-xl text-sm text-ink/70">The examiner's questions are read aloud. Your microphone is used for the live waveform, pause detection and transcription — audio stays on this device.</p>
       {!rec.srSupported && <p className="mt-3 rounded-2xl bg-white/70 p-3 text-sm">Live transcription is not available in this browser. Recording, the waveform and pause detection still work; for word-level feedback use Chrome, Edge or Safari, or type your answer afterwards.</p>}
@@ -195,7 +195,7 @@ export function SpeakingRunner({ cueId, mode, onFinish }: { cueId: string; mode:
       </div>
       <div className="grid content-start gap-4">
         <Bento className="flex flex-col items-center bg-mint text-center">
-          <Ring value={left / step.limit} size={132} stroke={10} color={left <= 10 ? '#EC6B78' : '#141416'}>
+          <Ring value={left / step.limit} size={132} stroke={10} color={left <= 10 ? 'var(--color-coral)' : 'var(--color-ink)'}>
             <div><div className="text-4xl font-extrabold tracking-tight tabnum">{Math.floor(left / 60)}:{String(left % 60).padStart(2, '0')}</div><div className="text-[11px] font-semibold opacity-60">{step.kind === 'prep' ? 'preparation' : 'to answer'}</div></div>
           </Ring>
           <div className="mt-4 flex justify-center gap-2">

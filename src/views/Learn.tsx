@@ -143,7 +143,7 @@ export default function Learn() {
           )}
           {step === 6 && (
             <div className="grid gap-5 lg:grid-cols-3">
-              <Bento className="bg-forest text-white"><Ring value={s.checklist.length / checkItems.length} size={120} stroke={10} color="#3F6F62"><span className="text-3xl font-extrabold tabnum">{Math.round((s.checklist.length / checkItems.length) * 100)}%</span></Ring><h3 className="mt-4 text-xl font-bold">Test-day readiness</h3><p className="mt-1 text-sm opacity-90">{s.checklist.length} of {checkItems.length} items ticked. Requirements vary by test centre — always follow your booking confirmation.</p></Bento>
+              <Bento className="bg-forest text-white"><Ring value={s.checklist.length / checkItems.length} size={120} stroke={10} color="var(--color-forest)"><span className="text-3xl font-extrabold tabnum">{Math.round((s.checklist.length / checkItems.length) * 100)}%</span></Ring><h3 className="mt-4 text-xl font-bold">Test-day readiness</h3><p className="mt-1 text-sm opacity-90">{s.checklist.length} of {checkItems.length} items ticked. Requirements vary by test centre — always follow your booking confirmation.</p></Bento>
               <div className="grid gap-4 lg:col-span-2">{CHECKLIST.map((g) => (
                 <Bento key={g.group} className="bg-white"><h3 className="mb-2 font-bold">{g.group}</h3>
                   <ul className="grid gap-1">{g.items.map((it) => { const on = s.checklist.includes(it); return (

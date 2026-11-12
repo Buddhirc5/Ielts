@@ -113,6 +113,6 @@ export function Task1Chart({ kind }: { kind: ChartKind }) {
 }
 export function Spark({ values }: { values: number[] }) {
   const W = 260, H = 90, x = (i: number) => 10 + (i * (W - 20)) / (values.length - 1), y = (v: number) => H - 10 - (v / 100) * (H - 20)
-  return <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm rounded-[20px] bg-white/70" role="img" aria-label="Trend line"><polyline fill="none" stroke="#141416" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={values.map((v, i) => `${x(i)},${y(v)}`).join(' ')} />{values.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r="4" fill="#EC6B78" />)}</svg>
+  return <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-sm rounded-[20px] bg-white/70" role="img" aria-label="Trend line"><polyline fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={values.map((v, i) => `${x(i)},${y(v)}`).join(' ')} />{values.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r="4" fill="#EC6B78" />)}</svg>
 }
 export { tip }

@@ -87,7 +87,7 @@ export default function Exam({ config }: { config: ExamConfig }) {
   const [flags, setFlags] = useState<Record<string, boolean>>({})
   const [cur, setCur] = useState<number>(0)
   const [unit, setUnit] = useState(0)
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
   const [font, setFont] = useState<keyof typeof FONT>('Standard')
   const [hideTime, setHideTime] = useState(false)
   const [left, setLeft] = useState(config.sections[0].kind === 'speaking' ? 0 : (config.sections[0] as any).minutes * 60)

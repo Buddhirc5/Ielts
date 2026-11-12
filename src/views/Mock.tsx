@@ -18,7 +18,7 @@ export default function Mock() {
   return (
     <div className="grid gap-6">
       <div className="grid gap-5 lg:grid-cols-3">
-        <Bento className="bg-coral text-white lg:col-span-2">
+        <Bento tone="sky" className="lg:col-span-2">
           <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Full Mock Exam Mode</h1>
           <p className="mt-2 max-w-xl text-sm opacity-95">A distraction-free simulation of the computer-delivered test: Listening, Reading, Writing and Speaking back to back, with one overall band at the end. Allow about 2 hours 45 minutes.</p>
           <div className="mt-5 flex flex-wrap items-center gap-3"><Pill variant="light" onClick={() => s.startExam(EXAMS.full(s.track))}><Timer size={16} {...ICON} /> Start full mock</Pill><button onClick={() => setBreathe(true)} className="min-h-11 text-sm font-medium text-ink/60 underline">Take a one-minute breather first</button></div>

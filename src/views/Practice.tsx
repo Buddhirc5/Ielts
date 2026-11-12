@@ -181,7 +181,7 @@ export default function Practice() {
         <SectionTitle right={<Pill variant="light" onClick={() => s.startExam(EXAMS.listening('practice'))}><RotateCcw size={15} {...ICON} /> All 4 parts</Pill>}>Listening practice</SectionTitle>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{LISTENING.map((p, i) => (
           <Bento key={p.id} className={['bg-mint', 'bg-lav', 'bg-butter', 'bg-white'][i]} onClick={() => s.startExam(EXAMS.part('listening', i, p.title))}>
-            <div className="flex items-start justify-between"><span className="grid h-11 w-11 place-items-center rounded-full bg-white shadow-sm"><Headphones size={18} {...ICON} /></span><span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold shadow-sm">{p.accent}</span></div>
+            <div className="flex items-start justify-between"><span className="grid h-11 w-11 place-items-center rounded-full bg-sky"><Headphones size={18} {...ICON} /></span><span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold shadow-sm">{p.accent}</span></div>
             <h3 className="mt-3 font-bold leading-snug">{p.title}</h3><p className="mt-1 text-xs font-semibold text-ink/60">{[...new Set(p.groups.map((g) => TYPE_LABEL[g.type]))].join(' · ')}</p>
             <p className="mt-2 text-xs text-ink/60">0.85× / 1.0× / 1.15× speed · replay allowed</p>
           </Bento>))}</div>
@@ -190,7 +190,7 @@ export default function Practice() {
         <SectionTitle right={<Pill variant="light" onClick={() => s.startExam(EXAMS.reading('practice'))}><RotateCcw size={15} {...ICON} /> All 40 questions</Pill>}>{s.track === 'academic' ? 'Academic' : 'General Training'} Reading practice</SectionTitle>
         <div className="grid gap-4 md:grid-cols-3">{R.map((p, i) => (
           <Bento key={p.id} className={['bg-lav', 'bg-butter', 'bg-mint'][i]} onClick={() => s.startExam(EXAMS.part('reading', i, p.title))}>
-            <div className="flex items-start justify-between"><span className="grid h-11 w-11 place-items-center rounded-full bg-white shadow-sm"><BookOpen size={18} {...ICON} /></span><span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold shadow-sm">{p.groups.reduce((a, g) => a + g.qs.length, 0)} questions</span></div>
+            <div className="flex items-start justify-between"><span className="grid h-11 w-11 place-items-center rounded-full bg-mint"><BookOpen size={18} {...ICON} /></span><span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold shadow-sm">{p.groups.reduce((a, g) => a + g.qs.length, 0)} questions</span></div>
             <h3 className="mt-3 text-lg font-bold leading-snug">{p.title}</h3><p className="mt-1 text-xs font-semibold text-ink/60">{[...new Set(p.groups.map((g) => TYPE_LABEL[g.type]))].join(' · ')}</p>
           </Bento>))}</div>
       </section>

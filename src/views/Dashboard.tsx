@@ -5,11 +5,13 @@ import type { Skill } from '../types'
 import { dayKey, hasBand, skillBands, useStore } from '../store'
 import { recommend } from '../lib/engines'
 import { DRILL_TYPES, EXAMS } from '../lib/exams'
-import { Bento, Breathe, ICON, Pill, Ring, cx, fmtBand } from '../components/ui'
+import { Megaphone } from 'lucide-react'
+import { useCloud } from '../lib/cloud'
+import { Bento, Breathe, ICON, Pill, Ring, cx, fmtBand, type Tone } from '../components/ui'
 
 export const SKILL_ICON: Record<Skill, LucideIcon> = { listening: Headphones, reading: BookOpen, writing: PenLine, speaking: Mic }
 const DAY = 86400000
-const DAILY_GOAL = 15 // minutes — deliberately small, so it is easy to begin
+const SKILL_TONE: Record<Skill, Tone> = { listening: 'sky', reading: 'sage', writing: 'sand', speaking: 'lilac' }
 const MINUTES: Record<Skill, number> = { listening: 10, reading: 10, writing: 20, speaking: 5 }
 
 export function useCountdown(date: string) {
@@ -30,6 +32,8 @@ export function useRunAction() {
 export default function Dashboard() {
   const s = useStore()
   const run = useRunAction()
+  const goal = s.dailyGoal || 15
+  const news = useCloud((c) => c.announcements).filter((a) => a.active)[0]
   const [more, setMore] = useState(false)
   const [breathe, setBreathe] = useState(false)
   const bands = skillBands(s.attempts)
@@ -44,7 +48,7 @@ export default function Dashboard() {
   const known = (Object.keys(bands) as Skill[]).filter((k) => hasBand(s.attempts, k))
   const avg = known.length ? Math.round((known.reduce((a, k) => a + bands[k], 0) / known.length) * 2) / 2 : null
   const top = recs[0]
-  const goalMsg = today === 0 ? 'A few minutes is enough to begin.' : today < DAILY_GOAL ? 'Nice start — you are on your way.' : 'Goal reached. Anything more is a bonus.'
+  const goalMsg = today === 0 ? 'A few minutes is enough to begin.' : today < goal ? 'Nice start — you are on your way.' : 'Goal reached. Anything more is a bonus.'
   const timeMsg = days == null ? 'Add your test date in your profile' : days > 21 ? 'Plenty of time — steady practice wins' : days > 7 ? 'On track — keep sessions short and regular' : 'Final week — light review and good sleep'
 
   return (
@@ -54,8 +58,10 @@ export default function Dashboard() {
         <p className="mt-1 text-ink/60">One small step today is enough.</p>
       </header>
 
+      {news && <div className="flex items-start gap-3 rounded-[20px] bg-sky p-4 text-sm"><Megaphone size={17} className="mt-0.5 shrink-0" {...ICON} /><span>{news.body}</span></div>}
+
       {/* one clear next action */}
-      <Bento>
+      <Bento tone={started ? SKILL_TONE[recs[0].module.skill] : 'sage'}>
         <div className="text-xs font-semibold uppercase tracking-wider text-ink/45">Your next step</div>
         {!started ? (
           <>
@@ -78,7 +84,7 @@ export default function Dashboard() {
               { icon: PenLine, label: 'Writing Lab', sub: 'instant feedback', go: () => s.setView('writing') },
               { icon: Mic, label: 'Speaking practice', sub: '2-minute cue card', go: () => s.setView('speaking') },
             ]).map((o) => (
-              <li key={o.label}><button onClick={o.go} className="flex min-h-12 w-full items-center gap-3 rounded-2xl px-2 text-left hover:bg-black/[.03]"><o.icon size={18} className="text-ink/50" {...ICON} /><span className="flex-1 font-medium">{o.label}</span><span className="text-sm text-ink/45">{o.sub}</span></button></li>
+              <li key={o.label}><button onClick={o.go} className="flex min-h-12 w-full items-center gap-3 rounded-2xl px-2 text-left hover:bg-black/[.03]"><o.icon size={18} className="text-ink/60" {...ICON} /><span className="flex-1 font-medium">{o.label}</span><span className="text-sm text-ink/45">{o.sub}</span></button></li>
             ))}
           </ul>
         )}
@@ -87,9 +93,9 @@ export default function Dashboard() {
       {/* today's gentle goal */}
       <Bento>
         <div className="flex items-center gap-5">
-          <Ring value={Math.min(1, today / DAILY_GOAL)} size={76} stroke={7} color="#3F6F62" track="rgba(28,28,30,.07)"><span className="text-lg font-bold tabnum">{today}</span></Ring>
+          <Ring value={Math.min(1, today / goal)} size={76} stroke={7} color="var(--color-forest)"><span className="text-lg font-bold tabnum">{today}</span></Ring>
           <div className="min-w-0 flex-1">
-            <div className="font-semibold">{today} of {DAILY_GOAL} minutes today</div>
+            <div className="font-semibold">{today} of {goal} minutes today</div>
             <p className="text-sm text-ink/60">{goalMsg}</p>
             <div className="mt-3 flex gap-1.5" aria-label="Practice days this week">{week.map((w, i) => <span key={i} className="flex flex-col items-center gap-1"><i className={cx('h-2.5 w-2.5 rounded-full', w.on ? 'bg-forest' : 'bg-black/10', w.today && !w.on && 'ring-2 ring-forest/30')} /><span className="text-[10px] text-ink/40">{w.d}</span></span>)}</div>
           </div>

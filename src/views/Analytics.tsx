@@ -21,10 +21,10 @@ function History() {
   return (
     <div>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Band score history by skill">
-        {[4, 5, 6, 7, 8, 9].map((b) => <g key={b}><line x1={L} x2={W - R} y1={y(b)} y2={y(b)} stroke="#141416" opacity=".08" /><text x={L - 8} y={y(b) + 4} fontSize="11" textAnchor="end" fill="#141416" opacity=".6">{b}</text></g>)}
-        {attempts.map((a, i) => <text key={a.id} x={x(i)} y={H - 8} fontSize="10" textAnchor="middle" fill="#141416" opacity=".6">{new Date(a.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</text>)}
+        {[4, 5, 6, 7, 8, 9].map((b) => <g key={b}><line x1={L} x2={W - R} y1={y(b)} y2={y(b)} stroke="currentColor" opacity=".08" /><text x={L - 8} y={y(b) + 4} fontSize="11" textAnchor="end" fill="currentColor" opacity=".6">{b}</text></g>)}
+        {attempts.map((a, i) => <text key={a.id} x={x(i)} y={H - 8} fontSize="10" textAnchor="middle" fill="currentColor" opacity=".6">{new Date(a.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</text>)}
         {SK.map((k) => { const pts = attempts.map((a, i) => (a.bands[k] != null ? [x(i), y(Math.max(4, a.bands[k]!)), a.bands[k]!] : null)).filter(Boolean) as number[][]; return (
-          <g key={k}><polyline fill="none" stroke={COL[k]} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" points={pts.map((p) => `${p[0]},${p[1]}`).join(' ')} />{pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r="4.5" fill="#fff" stroke={COL[k]} strokeWidth="2.5"><title>{`${k}: Band ${p[2]}`}</title></circle>)}</g>) })}
+          <g key={k}><polyline fill="none" stroke={COL[k]} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" points={pts.map((p) => `${p[0]},${p[1]}`).join(' ')} />{pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r="4.5" fill="var(--color-white)" stroke={COL[k]} strokeWidth="2.5"><title>{`${k}: Band ${p[2]}`}</title></circle>)}</g>) })}
       </svg>
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold">{SK.map((k) => <span key={k} className="inline-flex items-center gap-1.5 capitalize"><i className="h-2.5 w-2.5 rounded-full" style={{ background: COL[k] }} />{k}</span>)}</div>
     </div>

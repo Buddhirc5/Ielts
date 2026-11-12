@@ -9,13 +9,15 @@ export const fmtBand = (b: number) => (b ? b.toFixed(1) : '—')
 
 /** Cards are always quiet white surfaces: colour fills passed by older call sites are dropped. */
 const calm = (c: string) => c.replace(/!?\bbg-(mint|lav|butter|coral|forest|cream|gold|white)(\/\d+)?\b/g, '').replace(/\btext-white\b/g, '')
-export function Bento({ className = '', children, onClick, ...rest }: HTMLMotionProps<'div'> & { children: ReactNode }) {
+export type Tone = 'sage' | 'sky' | 'sand' | 'lilac'
+export const TONE: Record<Tone, string> = { sage: 'bg-mint', sky: 'bg-sky', sand: 'bg-butter', lilac: 'bg-lav' }
+export function Bento({ className = '', children, onClick, tone, ...rest }: HTMLMotionProps<'div'> & { children: ReactNode; tone?: Tone }) {
   return (
     <motion.div layout="position" initial={false} transition={spring}
       whileHover={onClick ? { y: -2 } : undefined} whileTap={onClick ? { scale: 0.985 } : undefined}
       onClick={onClick} role={onClick ? 'button' : undefined} tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => { if (e.key === 'Enter') (onClick as any)(e) } : undefined}
-      className={cx('card relative overflow-hidden rounded-[24px] p-5 sm:p-6', onClick && 'cursor-pointer', calm(className))} {...rest}>
+      className={cx('relative overflow-hidden rounded-[24px] p-5 sm:p-6', tone ? TONE[tone] : 'card', onClick && 'cursor-pointer', calm(className))} {...rest}>
       {children}
     </motion.div>
   )
@@ -46,7 +48,7 @@ export function Tag({ children }: { children: ReactNode; i?: number; className?:
 export function BandBadge({ band, className = '' }: { band: number; className?: string }) {
   return <span className={cx('inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-ink shadow-sm', className)}><Star size={13} {...ICON} /> Band {fmtBand(band)}</span>
 }
-export function Ring({ value, size = 64, stroke = 6, color = '#141416', track = 'rgba(20,20,22,.12)', children }: { value: number; size?: number; stroke?: number; color?: string; track?: string; children?: ReactNode }) {
+export function Ring({ value, size = 64, stroke = 6, color = 'var(--color-ink)', track = 'color-mix(in srgb, var(--color-black) 9%, transparent)', children }: { value: number; size?: number; stroke?: number; color?: string; track?: string; children?: ReactNode }) {
   const r = (size - stroke) / 2, c = 2 * Math.PI * r
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
@@ -68,7 +70,7 @@ export function Avatars({ names, extra }: { names: string[]; extra?: string }) {
   )
 }
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
-  return <div className="mb-4 flex flex-wrap items-end justify-between gap-3"><h2 className="text-2xl font-bold tracking-tight text-slate-900">{children}</h2>{right}</div>
+  return <div className="mb-4 flex flex-wrap items-end justify-between gap-3"><h2 className="text-2xl font-bold tracking-tight text-ink">{children}</h2>{right}</div>
 }
 export function Segmented<T extends string>({ value, onChange, options, className = '' }: { value: T; onChange: (v: T) => void; options: { value: T; label: string }[]; className?: string }) {
   return (
@@ -114,7 +116,7 @@ export function Meter({ value, max = 9, label, right }: { value: number; max?: n
 }
 export function Sheet({ children, onClose, wide }: { children: ReactNode; onClose: () => void; wide?: boolean }) {
   return (
-    <motion.div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+    <motion.div className="fixed inset-0 z-50 flex items-end justify-center scrim p-0 sm:items-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
       <motion.div role="dialog" aria-modal="true" initial={{ y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }} transition={spring} onClick={(e) => e.stopPropagation()}
         className={cx('max-h-[92vh] w-full overflow-y-auto safe-b rounded-t-[28px] bg-cream shadow-2xl no-scrollbar sm:rounded-[28px]', wide ? 'sm:max-w-3xl' : 'sm:max-w-lg')}>
         {children}
